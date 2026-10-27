@@ -4,6 +4,17 @@
 
 {% block content %}
   <h1>Review queue</h1>
+  <form method="get" action="{% url 'export_lessons' %}">
+    <label>Export lessons with status
+      <select name="status">
+        <option value="">Any</option>
+        <option value="submitted">Submitted</option>
+        <option value="approved">Approved</option>
+        <option value="rejected">Rejected</option>
+      </select>
+    </label>
+    <button type="submit">Download CSV</button>
+  </form>
   {% if lessons %}
     <table>
       <thead>
