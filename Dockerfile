@@ -31,3 +31,22 @@ COPY --chown=app:app . .
 USER app
 EXPOSE 8000
 CMD ["gunicorn", "portal.wsgi:application", "--bind", "0.0.0.0:8000", "--workers", "3", "--access-logfile", "-"]
+
+
+# Collect static files at build time; the values below exist only to import settings.
+FROM base AS static
+COPY . .
+RUN DJANGO_SECRET_KEY=collectstatic-only POSTGRES_PASSWORD=collectstatic-only \
+    PORTAL_ADDRESS=build POSTGRES_DB=build POSTGRES_USER=build \
+    python manage.py collectstatic --noinput
+
+
+# Caddy proxy with the static files baked in, so they can't go stale on a shared volume.
+FROM caddy:2.11.7-alpine AS proxy
+RUN addgroup -S proxy && adduser -S -G proxy proxy && chown -R proxy:proxy /data /config
+COPY proxy/Caddyfile /etc/caddy/Caddyfile
+COPY proxy/entrypoint.sh /usr/local/bin/proxy-entrypoint
+COPY --from=static /app/staticfiles /srv/static
+USER proxy
+EXPOSE 8080
+ENTRYPOINT ["/bin/sh", "/usr/local/bin/proxy-entrypoint"]
