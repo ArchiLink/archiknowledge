@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: SECURITY.md. Original brief: `quality_tracker_framework.pdf`.
+How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: SECURITY.md.
 
 @ARCHITECTURE.md
 @SECURITY.md
@@ -27,11 +27,12 @@ How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: S
 
 ## Workflow
 - Repository: https://github.com/ArchiLink/archiknowledge (default branch `main`).
+- Dependencies: uv, locked in `uv.lock`.
+- Tests: pytest + pytest-django; ≥ 80% branch coverage per the requirement template.
+- Lint/format: ruff for both.
+- Account lockout: django-axes. Scheduler: supercronic inside the `web` image. Backup encryption: `age`.
 
-Undecided (recommendation in brackets; replace each line once the user decides). SECURITY.md already requires a lockfile, a test suite and `pip-audit`; only the tools are open.
-- Dependency/lockfile tool: [uv with `uv.lock`].
-- Test runner: [pytest + pytest-django; ≥ 80% branch coverage per the requirement template].
-- Lint/format: [ruff for both].
+Undecided (recommendation in brackets; replace each line once the user decides).
 - Branch naming: [`req/<REQ-ID>-short-name`].
 - Commit message: [`<REQ-ID>: imperative summary`].
 - Commands (run, test, lint, migrate, create superuser): defined when the Docker skeleton exists.
