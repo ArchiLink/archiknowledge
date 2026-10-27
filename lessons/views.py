@@ -238,3 +238,22 @@ def embed_ticker(request):
     and only when FRAME_ANCESTORS is set (REQ-OPS-004)."""
     lessons = approved_lessons().order_by("-approved_at")[:TICKER_SIZE]
     return render(request, "lessons/embed_ticker.html", {"lessons": lessons})
+
+
+@login_not_required
+@require_GET
+def gallery(request):
+    """Failed vs Fixed images side by side for Approved lessons (REQ-GALLERY-001)."""
+    form = LessonFilterForm(request.GET)
+    if not form.is_valid():
+        return render(request, "400.html", status=400)
+    lessons = form.filter(approved_lessons().filter(images__isnull=False).distinct())
+    page = Paginator(lessons.prefetch_related("images"), PAGE_SIZE).get_page(
+        request.GET.get("page")
+    )
+    for lesson in page:
+        images = list(lesson.images.all())
+        lesson.failed_image = next((i for i in images if i.kind == LessonImage.Kind.FAILED), None)
+        lesson.fixed_image = next((i for i in images if i.kind == LessonImage.Kind.FIXED), None)
+    context = {"form": form, "page": page, "querystring": querystring_without_page(request)}
+    return render(request, "lessons/gallery.html", context)
