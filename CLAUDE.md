@@ -13,8 +13,8 @@ How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: S
 ## Guardrails
 - New GitHub issues MUST use the requirement template (`.github/ISSUE_TEMPLATE/requirement.yml`), with an ID `REQ-[MODULE]-[###]` using its module codes.
 - Implement against the issue's acceptance criteria. Each AC gets at least one test, and the PR states which tests cover which AC.
-- Work one issue at a time, on its own branch. Changes reach `main` only through a PR after human review.
-- Don't commit, push or open PRs unless the user asks.
+- Work one issue at a time, on its own branch. Changes reach `main` only through a PR.
+- When an issue is done and tests, ruff and `pip-audit` pass: commit, push, open the PR, squash-merge it, then pull `main` (user decision, 2026-10-27). Otherwise don't commit or push unless the user asks.
 - Ask before adding a dependency, a new container/service or a new third-party asset.
 - Any new setting is read from the environment and gets a documented key in `.env.example`. Never create or edit a real `.env`.
 - Don't build features that aren't in an issue or ARCHITECTURE.md.
@@ -32,8 +32,15 @@ How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: S
 - Lint/format: ruff for both.
 - Account lockout: django-axes. Scheduler: supercronic inside the `web` image. Backup encryption: `age`.
 
-Undecided (recommendation in brackets; replace each line once the user decides).
-- Branch naming: [`req/<REQ-ID>-short-name`].
-- Commit message: [`<REQ-ID>: imperative summary`].
-- Commands (run, test, lint, migrate, create superuser): defined when the Docker skeleton exists.
-- Release/deploy procedure on the intranet machine: unknown.
+- Branch: `req/<REQ-ID>-short-name`. Commit: `<REQ-ID>: imperative summary`, with `Closes #N` in the PR.
+- Release/deploy procedure on the intranet machine: to be written in REQ-OPS-007.
+
+## Commands
+- Test (pytest in a throwaway Postgres stack; fails under 80% branch coverage): `docker compose -f docker-compose.test.yml run --rm --build test`
+- Lint/format: `uv run ruff check .` and `uv run ruff format --check .`
+- Audit: `uv export --frozen --format requirements-txt --no-hashes > req.txt && uvx pip-audit -r req.txt` (write `req.txt` outside the repo)
+- Run: `docker compose up -d --build` (needs `.env`)
+- Migrate: `docker compose exec web python manage.py migrate`
+- Create superuser: `docker compose exec web python manage.py createsuperuser`
+- Deploy check: `docker compose exec web python manage.py check --deploy` (only the 4 HTTPS/HSTS/secure-cookie warnings are expected)
+- Add a dependency: `uv add <pkg>` (`--dev` for tooling); ask the user first.
