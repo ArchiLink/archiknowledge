@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Submit a lesson · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <h1>Submit a lesson</h1>
+  <p>Describe the omission, error or site lesson. QA reviews every submission before it is published.</p>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <button type="submit">Submit for review</button>
+  </form>
+{% endblock %}
