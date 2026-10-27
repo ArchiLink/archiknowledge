@@ -1,14 +1,18 @@
-<!doctype html>
+{% load static %}<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ portal_name }}{% endblock %}</title>
+  {# CSP-friendly HTMX: no inline indicator styles, no eval, no script tags in responses. #}
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false, "allowScriptTags": false}'>
+  <script src="{% static 'vendor/htmx/htmx-2.0.11.min.js' %}" defer></script>
 </head>
 {# HTMX sends the CSRF token on state-changing requests; only signed-in users make those. #}
 <body{% if user.is_authenticated %} hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'{% endif %}>
   <header>
     <a href="/">{{ portal_name }}</a>
+    <a href="{% url 'knowledge_base' %}">Knowledge base</a>
     {% if user.is_authenticated %}
       <a href="{% url 'submit_lesson' %}">Submit a lesson</a>
       <a href="{% url 'my_submissions' %}">My submissions</a>

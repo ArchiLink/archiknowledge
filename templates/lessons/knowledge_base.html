@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block title %}Knowledge base · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <h1>Knowledge base</h1>
+  <form method="get" action="{% url 'knowledge_base' %}" role="search"
+        hx-get="{% url 'knowledge_base' %}" hx-target="#results" hx-push-url="true"
+        hx-trigger="change, submit, input changed delay:400ms from:input[name=q]">
+    {{ form.as_div }}
+    <button type="submit">Search</button>
+  </form>
+  <div id="results">
+    {% include "lessons/_kb_results.html" %}
+  </div>
+{% endblock %}

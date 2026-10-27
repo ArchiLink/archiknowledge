@@ -217,3 +217,10 @@ def test_internal_endpoints_not_reachable_from_outside(live_image):
     with pytest.raises(urllib.error.HTTPError) as error:
         urllib.request.urlopen(request, timeout=10)
     assert error.value.code == 404
+
+
+def test_vendored_javascript_served_by_caddy():
+    # REQ-KB-001: HTMX comes from our own static files, not a CDN.
+    status, headers = fetch(PROXY, "/static/vendor/htmx/htmx-2.0.11.min.js")
+    assert status == 200
+    assert "javascript" in headers["Content-Type"]
