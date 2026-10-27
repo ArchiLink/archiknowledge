@@ -105,3 +105,115 @@ def test_static_files_served_by_caddy():
     status, headers = fetch(PROXY, "/static/admin/css/base.css")
     assert status == 200
     assert headers["Content-Type"].startswith("text/css")
+
+
+# REQ-MEDIA-002: images through Caddy's forward_auth, with rows in the live database that the
+# running web container reads and files in the shared media volume.
+
+
+@pytest.fixture
+def live_image():
+    """Create a lesson + image in the live (non-test) database; yield a factory."""
+    import io
+    import uuid
+    from pathlib import Path
+
+    import psycopg
+    from PIL import Image
+
+    conn = psycopg.connect(
+        host="db",
+        dbname=os.environ["POSTGRES_DB"],
+        user=os.environ["POSTGRES_USER"],
+        password=os.environ["POSTGRES_PASSWORD"],
+        autocommit=True,
+    )
+    media = Path(os.environ["LIVE_MEDIA_ROOT"])
+    created = []
+
+    def one(sql, *params):
+        return conn.execute(sql, params).fetchone()[0]
+
+    tag = uuid.uuid4().hex
+    user_id = one(
+        "INSERT INTO auth_user (password, is_superuser, username, first_name, last_name,"
+        " email, is_staff, is_active, date_joined) VALUES ('!', false, %s, '', '', '',"
+        " false, true, now()) RETURNING id",
+        f"live-{tag}",
+    )
+    project_id = one(
+        "INSERT INTO lessons_project (name, is_active) VALUES (%s, true) RETURNING id",
+        f"Live {tag}",
+    )
+    lookups = {
+        "phase_id": one("SELECT id FROM lessons_phase WHERE code = 'CD'"),
+        "discipline_id": one("SELECT id FROM lessons_discipline ORDER BY id LIMIT 1"),
+        "issue_type_id": one("SELECT id FROM lessons_issuetype ORDER BY id LIMIT 1"),
+        "building_component_id": one(
+            "SELECT id FROM lessons_buildingcomponent ORDER BY id LIMIT 1"
+        ),
+    }
+
+    def make(status):
+        lesson_id = one(
+            "INSERT INTO lessons_lesson (title, description, lesson, project_id, phase_id,"
+            " discipline_id, issue_type_id, building_component_id, impact, anonymise,"
+            " in_specs, in_standard_details, in_onboarding, status, submitted_by_id,"
+            " submitted_at) VALUES ('Live test', 'd', 'l', %s, %s, %s, %s, %s, 'medium',"
+            " false, false, false, false, %s, %s, now()) RETURNING id",
+            project_id,
+            *lookups.values(),
+            status,
+            user_id,
+        )
+        name = f"lessons/{uuid.uuid4().hex}.png"
+        (media / "lessons").mkdir(mode=0o750, exist_ok=True)
+        buffer = io.BytesIO()
+        Image.new("RGB", (4, 4), "blue").save(buffer, format="PNG")
+        path = media / name
+        path.write_bytes(buffer.getvalue())
+        path.chmod(0o640)
+        conn.execute(
+            "INSERT INTO lessons_lessonimage (lesson_id, kind, file, uploaded_at)"
+            " VALUES (%s, 'failed', %s, now())",
+            (lesson_id, name),
+        )
+        created.append((lesson_id, path))
+        return f"/media/{name}"
+
+    yield make
+
+    for lesson_id, path in created:
+        conn.execute("DELETE FROM lessons_lessonimage WHERE lesson_id = %s", (lesson_id,))
+        conn.execute("DELETE FROM lessons_lesson WHERE id = %s", (lesson_id,))
+        path.unlink(missing_ok=True)
+    conn.execute("DELETE FROM lessons_project WHERE id = %s", (project_id,))
+    conn.execute("DELETE FROM auth_user WHERE id = %s", (user_id,))
+    conn.close()
+
+
+def test_approved_image_served_through_proxy(live_image):
+    status, headers = fetch(PROXY, live_image("approved"))
+    assert status == 200
+    assert headers["Content-Type"] == "image/png"
+    assert headers["X-Content-Type-Options"] == "nosniff"
+
+
+@pytest.mark.parametrize("status", ["submitted", "rejected"])
+def test_unapproved_image_not_served_to_anonymous(live_image, status):
+    assert fetch(PROXY, live_image(status))[0] == 404
+
+
+def test_unknown_media_file_404_through_proxy():
+    assert fetch(PROXY, "/media/lessons/00000000000000000000000000000000.png")[0] == 404
+
+
+def test_internal_endpoints_not_reachable_from_outside(live_image):
+    uri = live_image("approved")
+    request = urllib.request.Request(
+        PROXY + "/internal/media-auth/",
+        headers={"Host": os.environ["PORTAL_ADDRESS"], "X-Forwarded-Uri": uri},
+    )
+    with pytest.raises(urllib.error.HTTPError) as error:
+        urllib.request.urlopen(request, timeout=10)
+    assert error.value.code == 404

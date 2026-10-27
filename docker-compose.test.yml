@@ -18,6 +18,8 @@ x-proxy: &proxy
   depends_on:
     web:
       condition: service_healthy
+  volumes:
+    - media:/srv/media:ro
   healthcheck:
     test: ["CMD-SHELL", "wget -q -O /dev/null --header 'Host: 192.0.2.10' http://127.0.0.1:8080/health/"]
     interval: 2s
@@ -33,6 +35,9 @@ services:
       <<: *django-env
       PROXY_URL: http://proxy:8080
       FRAMED_PROXY_URL: http://proxy-framed:8080
+      LIVE_MEDIA_ROOT: /app/live-media  # the media volume web and the proxies use
+    volumes:
+      - media:/app/live-media
     depends_on:
       proxy:
         condition: service_healthy
@@ -40,12 +45,16 @@ services:
         condition: service_healthy
     command: ["pytest"]
 
-  # Production image behind both proxies, for header and size-limit tests.
+  # Production image behind both proxies, for end-to-end proxy tests. It migrates the
+  # (non-test) database first so tests/test_proxy.py can add rows that it reads.
   web:
     build:
       context: .
       target: runtime
     environment: *django-env
+    command: ["sh", "-c", "python manage.py migrate --noinput && exec gunicorn portal.wsgi:application --bind 0.0.0.0:8000"]
+    volumes:
+      - media:/app/media
     depends_on:
       db:
         condition: service_healthy
@@ -81,3 +90,6 @@ services:
       interval: 2s
       timeout: 5s
       retries: 15
+
+volumes:
+  media:
