@@ -22,6 +22,7 @@ PUBLIC_VIEWS = {
     "knowledge_base",
     "dashboard",
     "feed",
+    "embed_ticker",
 }
 
 

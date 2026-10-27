@@ -224,3 +224,11 @@ def test_vendored_javascript_served_by_caddy():
     status, headers = fetch(PROXY, "/static/vendor/htmx/htmx-2.0.11.min.js")
     assert status == 200
     assert "javascript" in headers["Content-Type"]
+
+
+def test_embed_ticker_page_served_framed():
+    # REQ-FEED-003: the real ticker page through the framing-enabled proxy.
+    status, headers = fetch(FRAMED_PROXY, "/embed/ticker/")
+    assert status == 200
+    assert "X-Frame-Options" not in headers
+    assert f"frame-ancestors {FRAME_ANCESTORS}" in headers["Content-Security-Policy"]
