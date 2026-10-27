@@ -5,6 +5,7 @@ description = "Design Quality Log & Knowledge Portal"
 requires-python = "==3.12.*"
 dependencies = [
     "django>=5.2,<5.3",
+    "django-axes>=8",
     "gunicorn>=23",
     "psycopg[binary]>=3.2",
 ]
