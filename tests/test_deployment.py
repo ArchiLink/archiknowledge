@@ -34,6 +34,16 @@ def test_only_proxy_publishes_ports():
         assert not publishes or name in PUBLIC_SERVICES, f"{name} publishes a port"
 
 
+def test_proxy_publishes_only_portal_port_on_http():
+    # REQ-OPS-004 AC-05
+    services = compose_services((ROOT / "docker-compose.yml").read_text())
+    mappings = [line.strip() for line in services["proxy"] if line.strip().startswith('- "$')]
+    assert mappings == ['- "${PORTAL_PORT:-80}:8080"']
+    caddyfile = (ROOT / "proxy" / "Caddyfile").read_text()
+    assert "auto_https off" in caddyfile
+    assert ":443" not in caddyfile
+
+
 def test_images_are_pinned_to_specific_tags():
     text = (ROOT / "Dockerfile").read_text() + (ROOT / "docker-compose.yml").read_text()
     stages = set(re.findall(r"^FROM \S+ AS (\w+)", text, re.MULTILINE))

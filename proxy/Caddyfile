@@ -1,0 +1,65 @@
+# Front end for the portal (SECURITY.md "HTTP boundary"). Plain HTTP only.
+# MAX_BODY_MB and FRAME_ANCESTORS are set by entrypoint.sh.
+{
+	admin off
+	auto_https off
+}
+
+(base_headers) {
+	header {
+		defer
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "same-origin"
+		-Server
+	}
+}
+
+(deny_framing) {
+	header {
+		defer
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+		X-Frame-Options "DENY"
+	}
+}
+
+:8080 {
+	import base_headers
+
+	# Reject oversized bodies from Content-Length before anything reaches Django;
+	# request_body also caps bodies sent without a length.
+	request_body {
+		max_size {$MAX_BODY_MB}MB
+	}
+	@too_large expression `{http.request.header.Content-Length} != "" && int({http.request.header.Content-Length}) > {$MAX_BODY_BYTES}`
+	handle @too_large {
+		import deny_framing
+		respond "Request body too large" 413 {
+			close
+		}
+	}
+
+	# Only /embed/* may be framed, and only when FRAME_ANCESTORS is set.
+	@framed_embed {
+		path /embed/*
+		expression "'{$FRAME_ANCESTORS}' != ''"
+	}
+	handle @framed_embed {
+		header {
+			defer
+			Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors {$FRAME_ANCESTORS}"
+			-X-Frame-Options
+		}
+		reverse_proxy web:8000
+	}
+
+	handle /static/* {
+		import deny_framing
+		root * /srv
+		file_server
+	}
+
+	handle {
+		import deny_framing
+		reverse_proxy web:8000
+	}
+}
