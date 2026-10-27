@@ -1,13 +1,16 @@
 from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods
+from django.views.decorators.vary import vary_on_headers
 
 from core.audit import audit
 from core.roles import QA_GROUP, STAFF_GROUP, is_qa_reviewer
 from lessons import review
+from lessons.browse import PAGE_SIZE, LessonFilterForm, approved_lessons
 from lessons.forms import LessonSubmitForm, ReviewForm
 from lessons.models import Lesson, LessonImage
 
@@ -134,3 +137,23 @@ def lesson_detail(request, pk):
         pk=pk,
     )
     return render(request, "lessons/lesson_detail.html", {"lesson": lesson})
+
+
+@login_not_required
+@require_GET
+@vary_on_headers("HX-Request")
+def knowledge_base(request):
+    form = LessonFilterForm(request.GET)
+    if not form.is_valid():
+        return render(request, "400.html", {"form": form}, status=400)
+    page = Paginator(form.filter(approved_lessons()), PAGE_SIZE).get_page(request.GET.get("page"))
+    context = {"form": form, "page": page, "querystring": querystring_without_page(request)}
+    if request.headers.get("HX-Request"):
+        return render(request, "lessons/_kb_results.html", context)
+    return render(request, "lessons/knowledge_base.html", context)
+
+
+def querystring_without_page(request):
+    params = request.GET.copy()
+    params.pop("page", None)
+    return params.urlencode()

@@ -127,6 +127,7 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+STATICFILES_DIRS = [BASE_DIR / "static"]  # includes vendored HTMX/Chart.js
 
 # Uploaded images: a Docker volume in production, served only after an access check.
 MEDIA_URL = "/media/"
