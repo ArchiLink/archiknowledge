@@ -9,7 +9,7 @@ from django.views.decorators.vary import vary_on_headers
 
 from core.audit import audit
 from core.roles import QA_GROUP, STAFF_GROUP, is_qa_reviewer
-from lessons import review
+from lessons import notifications, review
 from lessons.browse import (
     PAGE_SIZE,
     FeedFilterForm,
@@ -35,6 +35,7 @@ def submit_lesson(request):
     if request.method == "POST" and form.is_valid():
         lesson = save_submission(form, request.user)
         audit("submission", request.user, lesson_id=lesson.pk)
+        notifications.notify_submitted(lesson, request)
         return redirect("submit_done", pk=lesson.pk)
     return render(request, "lessons/submit.html", {"form": form})
 
@@ -128,6 +129,7 @@ def review_lesson(request, pk):
                     )
                 if REVIEW_ACTIONS[action]:
                     REVIEW_ACTIONS[action](lesson, request.user)
+                    notifications.notify_reviewed(lesson, request)
             if action == "save":
                 return redirect("review_lesson", pk=lesson.pk)
             return redirect("review_queue")

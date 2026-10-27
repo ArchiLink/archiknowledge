@@ -120,6 +120,15 @@ AXES_IPWARE_PROXY_COUNT = 1
 
 PORTAL_NAME = env.get_str("PORTAL_NAME", "Design Quality Log")
 
+# Outbound email; sending is skipped (and logged) while EMAIL_HOST is empty (SECURITY.md).
+EMAIL_HOST = env.get_str("EMAIL_HOST")
+EMAIL_PORT = env.get_int("EMAIL_PORT", 25)
+EMAIL_HOST_USER = env.get_str("EMAIL_HOST_USER")
+EMAIL_HOST_PASSWORD = env.get_str("EMAIL_HOST_PASSWORD")
+EMAIL_USE_TLS = env.get_bool("EMAIL_USE_TLS", default=False)
+EMAIL_TIMEOUT = 10
+DEFAULT_FROM_EMAIL = env.get_str("DEFAULT_FROM_EMAIL") or "portal@localhost"
+
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = env.get_str("TIME_ZONE", "UTC")
 USE_I18N = True

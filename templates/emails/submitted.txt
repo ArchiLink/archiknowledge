@@ -1,0 +1,11 @@
+{% autoescape off %}A new lesson is waiting for QA review.
+
+Title: {{ lesson.title }}
+Project: {{ lesson.public_project }}
+Phase: {{ lesson.phase }}
+Submitted by: {{ lesson.submitted_by.get_username }}
+
+Review it here: {{ review_url }}
+
+This is an automatic message from {{ portal_name }}.
+{% endautoescape %}

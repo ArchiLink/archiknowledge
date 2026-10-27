@@ -1,0 +1,9 @@
+{% autoescape off %}{% if approved %}Your lesson has been approved and published.{% else %}Your lesson was reviewed and not approved for publication.{% endif %}
+
+Title: {{ lesson.title }}
+Project: {{ lesson.public_project }}
+
+{% if approved %}Read it here: {{ url }}{% else %}See it in My submissions: {{ url }}{% endif %}
+
+This is an automatic message from {{ portal_name }}.
+{% endautoescape %}
