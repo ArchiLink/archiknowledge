@@ -11,6 +11,13 @@ x-django-env: &django-env
   POSTGRES_USER: ${POSTGRES_USER:?set in .env}
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
 
+# Cap log size per container (SECURITY.md); the host keeps logs for 90 days.
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "10"
+
 services:
   proxy:
     build:
@@ -32,6 +39,7 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    logging: *logging
 
   web:
     build:
@@ -47,6 +55,7 @@ services:
       timeout: 10s
       retries: 3
     restart: unless-stopped
+    logging: *logging
 
   db:
     image: postgres:16.15-bookworm
@@ -62,6 +71,7 @@ services:
       timeout: 5s
       retries: 5
     restart: unless-stopped
+    logging: *logging
 
 volumes:
   pgdata:

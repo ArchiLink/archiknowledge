@@ -85,3 +85,20 @@ STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Everything goes to stdout; Docker rotates it (SECURITY.md). Request bodies are never logged.
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "plain": {"format": "{asctime} {levelname} {name} {message}", "style": "{"},
+    },
+    "handlers": {
+        "stdout": {"class": "logging.StreamHandler", "formatter": "plain"},
+    },
+    "root": {"handlers": ["stdout"], "level": "INFO"},
+    "loggers": {
+        # Django's own console handler only runs with DEBUG on; send errors to stdout instead.
+        "django": {"handlers": [], "level": "INFO", "propagate": True},
+    },
+}
