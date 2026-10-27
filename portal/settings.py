@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "axes",
     "core",  # after axes, so core.admin can wrap axes' admin classes
+    "lessons",
 ]
 
 MIDDLEWARE = [
