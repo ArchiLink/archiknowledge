@@ -346,4 +346,4 @@ body:
     attributes:
       label: AI Development Guidance
       description: Applicable prompt library, required CLAUDE.md rules, mandatory human review gates.
-      value: Follow CLAUDE.md, ARCHITECTURE.md and SECURITY.md. Changes merge only via PR after human review.
+      value: Follow CLAUDE.md, ARCHITECTURE.md and SECURITY.md. Changes merge only via PR once tests, ruff and pip-audit pass.

@@ -1,0 +1,40 @@
+[project]
+name = "quality-portal"
+version = "0.1.0"
+description = "Design Quality Log & Knowledge Portal"
+requires-python = "==3.12.*"
+dependencies = [
+    "django>=5.2,<5.3",
+    "gunicorn>=23",
+    "psycopg[binary]>=3.2",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "pytest-django>=4.14.0",
+    "ruff>=0.17.3",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "portal.settings"
+python_files = ["test_*.py"]
+addopts = "--cov --cov-branch --cov-report=term-missing --cov-fail-under=80"
+
+[tool.coverage.run]
+source = ["."]
+omit = ["tests/*", "manage.py", "portal/wsgi.py", "*/migrations/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "DJ", "S"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S106", "S603"]  # asserts, fake test secrets, subprocess

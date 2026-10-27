@@ -1,0 +1,46 @@
+# Production stack. Values come from .env (see .env.example).
+# Only the proxy publishes a port (added in REQ-OPS-004); web and db stay internal.
+
+x-django-env: &django-env
+  DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:?set in .env}
+  DJANGO_DEBUG: ${DJANGO_DEBUG:-False}
+  PORTAL_ADDRESS: ${PORTAL_ADDRESS:?set in .env}
+  PORTAL_PORT: ${PORTAL_PORT:-80}
+  TIME_ZONE: ${TIME_ZONE:-UTC}
+  POSTGRES_DB: ${POSTGRES_DB:?set in .env}
+  POSTGRES_USER: ${POSTGRES_USER:?set in .env}
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+
+services:
+  web:
+    build:
+      context: .
+      target: runtime
+    environment: *django-env
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os, urllib.request; urllib.request.urlopen(urllib.request.Request('http://127.0.0.1:8000/health/', headers={'Host': os.environ['PORTAL_ADDRESS']}), timeout=5)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  db:
+    image: postgres:16.15-bookworm
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:?set in .env}
+      POSTGRES_USER: ${POSTGRES_USER:?set in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  pgdata:
