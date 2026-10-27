@@ -11,6 +11,7 @@ from core.audit import audit
 from core.roles import QA_GROUP, STAFF_GROUP, is_qa_reviewer
 from lessons import review
 from lessons.browse import PAGE_SIZE, LessonFilterForm, approved_lessons
+from lessons.export import ExportFilterForm, csv_response
 from lessons.forms import IncorporationForm, LessonSubmitForm, ReviewForm
 from lessons.models import Lesson, LessonImage
 
@@ -177,3 +178,14 @@ def querystring_without_page(request):
     params = request.GET.copy()
     params.pop("page", None)
     return params.urlencode()
+
+
+@require_GET
+def export_lessons(request):
+    require_qa(request.user)
+    form = ExportFilterForm(request.GET)
+    if not form.is_valid():
+        return render(request, "400.html", status=400)
+    response, count = csv_response(form.lessons(), request)
+    audit("export", request.user, count=count)
+    return response
