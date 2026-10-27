@@ -1,0 +1,349 @@
+name: Requirement
+description: Define a testable requirement for the Design Quality Log & Knowledge Portal.
+title: "REQ-[MODULE]-[###]: "
+labels: ["requirement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Read [ARCHITECTURE.md](../blob/main/ARCHITECTURE.md) and [SECURITY.md](../blob/main/SECURITY.md) before filling this in.
+        Module codes for the ID: `AUTH` (login, roles), `SUBMIT` (submission form), `REVIEW` (QA queue), `FEED` (dashboard/ticker), `KB` (knowledge base),
+        `GALLERY` (Redline Gallery), `LESSON` (detail page), `MEDIA` (uploads), `EMAIL` (notifications/digest), `ADMIN` (lookups, users), `OPS` (deployment, backups).
+
+  # --- Metadata ---
+  - type: markdown
+    attributes:
+      value: "## Metadata"
+  - type: input
+    id: req_id
+    attributes:
+      label: ID
+      description: "REQ-[MODULE]-[###], using a module code listed above."
+      placeholder: REQ-SUBMIT-001
+    validations:
+      required: true
+  - type: input
+    id: req_title
+    attributes:
+      label: Title
+      description: Concise requirement name.
+      placeholder: Submission form accepts Failed/Fixed images
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Semantic version of this requirement.
+      value: 1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: Status
+      options:
+        - Draft
+        - Review
+        - Approved
+        - Deprecated
+      default: 0
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author
+      placeholder: Name
+    validations:
+      required: true
+  - type: input
+    id: last_updated
+    attributes:
+      label: Last Updated
+      description: ISO 8601 date.
+      placeholder: YYYY-MM-DD
+    validations:
+      required: true
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - Critical
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+  - type: dropdown
+    id: classification
+    attributes:
+      label: Classification
+      options:
+        - Functional
+        - Security
+        - Compliance
+        - Performance
+        - Operational
+    validations:
+      required: true
+
+  # --- Requirement ---
+  - type: markdown
+    attributes:
+      value: "## Requirement"
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Single-sentence, unambiguous statement of what the system MUST do. Use RFC 2119 keywords (MUST, MUST NOT, SHALL, SHOULD, MAY).
+      placeholder: The system MUST reject uploaded images larger than MAX_UPLOAD_MB.
+    validations:
+      required: true
+  - type: textarea
+    id: rationale
+    attributes:
+      label: Rationale
+      description: Why this requirement exists (business, regulatory, or threat-driven justification).
+    validations:
+      required: true
+
+  # --- Scope ---
+  - type: markdown
+    attributes:
+      value: "## Scope"
+  - type: dropdown
+    id: applies_to
+    attributes:
+      label: Applies To
+      description: The portal is a server-rendered web app with no public API (see ARCHITECTURE.md).
+      options:
+        - Web App
+        - API
+        - Both
+      default: 0
+    validations:
+      required: true
+  - type: dropdown
+    id: components
+    attributes:
+      label: Components
+      multiple: true
+      options:
+        - Authentication & roles
+        - Submission form
+        - QA review queue
+        - Dashboard / ticker
+        - Knowledge base
+        - Redline Gallery
+        - Lesson detail
+        - Media / uploads
+        - Email notifications & digest
+        - Admin & lookup lists
+        - Embed (/embed/ticker/)
+        - Deployment & backups
+    validations:
+      required: true
+  - type: dropdown
+    id: actors
+    attributes:
+      label: Actors
+      multiple: true
+      options:
+        - Intranet viewer (no login)
+        - Staff (logged in)
+        - QA Reviewer
+        - Admin
+        - Scheduler (system job)
+    validations:
+      required: true
+  - type: dropdown
+    id: data_classification
+    attributes:
+      label: Data Classification
+      description: Per SECURITY.md, lesson data is Internal; project names flagged for anonymisation are Confidential.
+      options:
+        - Public
+        - Internal
+        - Confidential
+        - Restricted/PII
+        - Regulated (PCI-DSS, SOX, GLBA)
+    validations:
+      required: true
+
+  # --- Security Context ---
+  - type: markdown
+    attributes:
+      value: "## Security Context"
+  - type: dropdown
+    id: defense_layer
+    attributes:
+      label: Defense Layer
+      multiple: true
+      options:
+        - Architecture
+        - Input Validation
+        - Strict API
+        - Encoding
+        - Sanitization
+  - type: textarea
+    id: threats
+    attributes:
+      label: Threat(s) Addressed
+      description: Reference specific threats, e.g. OWASP Top Ten A01:2021, CWE-89, STRIDE category.
+  - type: textarea
+    id: trust_boundary
+    attributes:
+      label: Trust Boundary
+      description: Where does this requirement enforce a trust boundary? e.g. browser ↔ Caddy, Caddy ↔ Django, Django ↔ Postgres, public vs login-required views, outbound SMTP.
+  - type: textarea
+    id: zero_trust
+    attributes:
+      label: Zero Trust Consideration
+      description: How does this requirement treat input as untrusted? What independent validation does it perform?
+
+  # --- Standards Alignment ---
+  - type: markdown
+    attributes:
+      value: "## Standards Alignment"
+  - type: input
+    id: asvs
+    attributes:
+      label: OWASP ASVS
+      placeholder: e.g. V2.1.1
+  - type: input
+    id: aisvs
+    attributes:
+      label: OWASP AISVS
+      description: Only if AI/LLM components are involved (none in ARCHITECTURE.md).
+      placeholder: N/A
+  - type: input
+    id: nist_800_53
+    attributes:
+      label: NIST SP 800-53
+      placeholder: e.g. SI-10, AC-3
+  - type: input
+    id: nist_800_207
+    attributes:
+      label: NIST SP 800-207
+      description: Zero Trust principle, if applicable.
+  - type: input
+    id: regulatory
+    attributes:
+      label: Regulatory
+      description: PCI-DSS, GLBA/Reg P, SOX, OCC, FFIEC reference, if any.
+      placeholder: None identified (internal tool)
+  - type: input
+    id: other_standards
+    attributes:
+      label: Other
+      placeholder: e.g. RFC 9700, FIDO2/WebAuthn, ISO 27001 control
+
+  # --- Acceptance Criteria ---
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      description: Each criterion MUST be independently testable. Use Given/When/Then or explicit pass/fail conditions.
+      value: |
+        1. **AC-01**: Given [precondition], when [action], then [expected outcome].
+        2. **AC-02**: Given [precondition], when [invalid/malicious input], then [system rejects input and returns appropriate error - no processing occurs].
+        3. **AC-03**: [Negative test case - what MUST NOT happen.]
+    validations:
+      required: true
+
+  # --- Failure Behavior ---
+  - type: markdown
+    attributes:
+      value: "## Failure Behavior"
+  - type: textarea
+    id: on_invalid_input
+    attributes:
+      label: On Invalid Input
+      value: Reject with HTTP [status code], log event with correlation ID, do NOT disclose internal state.
+  - type: textarea
+    id: on_system_error
+    attributes:
+      label: On System Error
+      value: "Fail closed. [Describe behavior.]"
+  - type: textarea
+    id: alerting
+    attributes:
+      label: Alerting
+      description: What triggers an alert? Threshold? Destination? (No alerting stack exists; logs go to Docker stdout per SECURITY.md.)
+
+  # --- Test Strategy ---
+  - type: markdown
+    attributes:
+      value: "## Test Strategy"
+  - type: textarea
+    id: unit_tests
+    attributes:
+      label: Unit Tests
+      description: What logic is unit-testable? Target coverage.
+  - type: textarea
+    id: integration_tests
+    attributes:
+      label: Integration Tests
+      description: Cross-service or cross-boundary validation (e.g. Django ↔ Postgres, Caddy forward_auth ↔ Django, SMTP).
+  - type: textarea
+    id: security_tests
+    attributes:
+      label: Security Tests
+      description: SAST rule, DAST scan target, fuzzing input class, manual pentest checklist item.
+  - type: textarea
+    id: compliance_tests
+    attributes:
+      label: Compliance Tests
+      description: Automated evidence collection for audit (log presence, config validation, policy enforcement).
+  - type: input
+    id: coverage_target
+    attributes:
+      label: Coverage Target
+      value: "≥ 80% branch coverage for implementing module"
+
+  # --- Dependencies ---
+  - type: markdown
+    attributes:
+      value: "## Dependencies"
+  - type: input
+    id: upstream
+    attributes:
+      label: Upstream
+      description: Requirements this depends on.
+      placeholder: e.g. REQ-AUTH-001 must be satisfied before REQ-REVIEW-001
+  - type: input
+    id: downstream
+    attributes:
+      label: Downstream
+      description: Requirements that depend on this one.
+  - type: input
+    id: external
+    attributes:
+      label: External
+      description: Third-party services or systems (e.g. SMTP relay, WordPress intranet link).
+
+  # --- Implementation Notes ---
+  - type: markdown
+    attributes:
+      value: "## Implementation Notes"
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints
+      description: Technology constraints, latency budgets, deadlines.
+  - type: textarea
+    id: anti_patterns
+    attributes:
+      label: Anti-Patterns
+      description: Explicitly prohibited approaches.
+      placeholder: |
+        MUST NOT use client-side validation as sole enforcement.
+        MUST NOT log credentials or session IDs.
+  - type: textarea
+    id: ai_guidance
+    attributes:
+      label: AI Development Guidance
+      description: Applicable prompt library, required CLAUDE.md rules, mandatory human review gates.
+      value: Follow CLAUDE.md, ARCHITECTURE.md and SECURITY.md. Changes merge only via PR after human review.

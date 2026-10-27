@@ -1,0 +1,8 @@
+# Secrets and local data (see SECURITY.md)
+.env
+backups/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
