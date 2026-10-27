@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}Review: {{ lesson.title }} · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'review_queue' %}">← Review queue</a></p>
+  <h1>Review lesson</h1>
+  <p>Status: <strong>{{ lesson.get_status_display }}</strong>
+    · submitted by {{ lesson.submitted_by.get_username }} on {{ lesson.submitted_at|date:"j M Y" }}
+    {% if lesson.reviewed_by %}· last reviewed by {{ lesson.reviewed_by.get_username }} on {{ lesson.reviewed_at|date:"j M Y" }}{% endif %}</p>
+
+  {% for image in lesson.images.all %}
+    <figure>
+      <img src="{{ image.file.url }}" alt="{{ image.get_kind_display }} image" loading="lazy">
+      <figcaption>{{ image.get_kind_display }}</figcaption>
+    </figure>
+  {% endfor %}
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_div }}
+    <button type="submit" name="action" value="save">Save changes</button>
+    <button type="submit" name="action" value="approve">Save and approve</button>
+    <button type="submit" name="action" value="reject">Save and reject</button>
+  </form>
+{% endblock %}
