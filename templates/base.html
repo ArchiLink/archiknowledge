@@ -9,6 +9,7 @@
   <header>
     <a href="/">{{ portal_name }}</a>
     {% if user.is_authenticated %}
+      <a href="{% url 'submit_lesson' %}">Submit a lesson</a>
       <span>Signed in as {{ user.get_username }}</span>
       <form method="post" action="{% url 'logout' %}">
         {% csrf_token %}
