@@ -44,6 +44,15 @@ def test_proxy_publishes_only_portal_port_on_http():
     assert ":443" not in caddyfile
 
 
+def test_every_service_rotates_logs():
+    # REQ-OPS-005 AC-05
+    text = (ROOT / "docker-compose.yml").read_text()
+    assert re.search(r'max-size: "\d+m"', text)
+    assert re.search(r'max-file: "\d+"', text)
+    for name, lines in compose_services(text).items():
+        assert "    logging: *logging" in lines, f"{name} has no log rotation"
+
+
 def test_images_are_pinned_to_specific_tags():
     text = (ROOT / "Dockerfile").read_text() + (ROOT / "docker-compose.yml").read_text()
     stages = set(re.findall(r"^FROM \S+ AS (\w+)", text, re.MULTILINE))
