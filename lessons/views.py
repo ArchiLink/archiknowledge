@@ -1,11 +1,13 @@
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
+from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_http_methods
 
 from core.audit import audit
-from core.roles import QA_GROUP, STAFF_GROUP
-from lessons.forms import LessonSubmitForm
+from core.roles import QA_GROUP, STAFF_GROUP, is_qa_reviewer
+from lessons import review
+from lessons.forms import LessonSubmitForm, ReviewForm
 from lessons.models import Lesson, LessonImage
 
 
@@ -71,3 +73,50 @@ def my_submission_detail(request, pk):
         submitted_by=request.user,
     )
     return render(request, "lessons/my_submission_detail.html", {"lesson": lesson})
+
+
+def require_qa(user):
+    if not is_qa_reviewer(user):
+        raise PermissionDenied
+
+
+@require_GET
+def review_queue(request):
+    require_qa(request.user)
+    lessons = (
+        Lesson.objects.filter(status=Lesson.Status.SUBMITTED)
+        .select_related("project", "phase", "submitted_by")
+        .order_by("submitted_at")
+    )
+    return render(request, "lessons/review_queue.html", {"lessons": lessons})
+
+
+REVIEW_ACTIONS = {"save": None, "approve": review.approve, "reject": review.reject}
+
+
+@require_http_methods(["GET", "POST"])
+def review_lesson(request, pk):
+    require_qa(request.user)
+    lesson = get_object_or_404(Lesson.objects.prefetch_related("images"), pk=pk)
+    was_anonymised = lesson.anonymise
+    form = ReviewForm(request.POST or None, instance=lesson)
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action not in REVIEW_ACTIONS:
+            return HttpResponseBadRequest("Unknown action.")
+        if form.is_valid():
+            with transaction.atomic():
+                lesson = form.save()
+                if lesson.anonymise != was_anonymised:
+                    audit(
+                        "anonymise_change",
+                        request.user,
+                        lesson_id=lesson.pk,
+                        anonymise=lesson.anonymise,
+                    )
+                if REVIEW_ACTIONS[action]:
+                    REVIEW_ACTIONS[action](lesson, request.user)
+            if action == "save":
+                return redirect("review_lesson", pk=lesson.pk)
+            return redirect("review_queue")
+    return render(request, "lessons/review_lesson.html", {"form": form, "lesson": lesson})

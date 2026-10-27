@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+
+{% block title %}Review queue · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <h1>Review queue</h1>
+  {% if lessons %}
+    <table>
+      <thead>
+        <tr><th>Title</th><th>Project</th><th>Phase</th><th>Submitted by</th><th>Submitted</th></tr>
+      </thead>
+      <tbody>
+        {% for lesson in lessons %}
+          <tr>
+            <td><a href="{% url 'review_lesson' lesson.pk %}">{{ lesson.title }}</a></td>
+            <td>{{ lesson.project }}</td>
+            <td>{{ lesson.phase.code }}</td>
+            <td>{{ lesson.submitted_by.get_username }}</td>
+            <td>{{ lesson.submitted_at|date:"j M Y" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>Nothing is waiting for review.</p>
+  {% endif %}
+{% endblock %}
