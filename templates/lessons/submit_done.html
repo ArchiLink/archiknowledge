@@ -5,5 +5,5 @@
 {% block content %}
   <h1>Thank you</h1>
   <p>“{{ lesson.title }}” has been submitted and is waiting for QA review.</p>
-  <p><a href="{% url 'submit_lesson' %}">Submit another lesson</a></p>
+  <p><a href="{% url 'my_submissions' %}">See my submissions</a> · <a href="{% url 'submit_lesson' %}">Submit another lesson</a></p>
 {% endblock %}

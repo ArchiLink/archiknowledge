@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods
 
 from core.audit import audit
 from core.roles import QA_GROUP, STAFF_GROUP
@@ -52,3 +52,22 @@ def save_submission(form, user):
 def submit_done(request, pk):
     lesson = get_object_or_404(Lesson, pk=pk, submitted_by=request.user)
     return render(request, "lessons/submit_done.html", {"lesson": lesson})
+
+
+@require_GET
+def my_submissions(request):
+    lessons = Lesson.objects.filter(submitted_by=request.user).select_related("project", "phase")
+    return render(request, "lessons/my_submissions.html", {"lessons": lessons})
+
+
+@require_GET
+def my_submission_detail(request, pk):
+    # Filtered by owner, so another user's lesson is a plain 404 (no hint that it exists).
+    lesson = get_object_or_404(
+        Lesson.objects.select_related(
+            "project", "phase", "discipline", "issue_type", "building_component"
+        ).prefetch_related("images"),
+        pk=pk,
+        submitted_by=request.user,
+    )
+    return render(request, "lessons/my_submission_detail.html", {"lesson": lesson})

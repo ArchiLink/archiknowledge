@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}My submissions · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <h1>My submissions</h1>
+  {% if lessons %}
+    <table>
+      <thead>
+        <tr><th>Title</th><th>Project</th><th>Phase</th><th>Status</th><th>Submitted</th><th>Reviewed</th></tr>
+      </thead>
+      <tbody>
+        {% for lesson in lessons %}
+          <tr>
+            <td><a href="{% url 'my_submission_detail' lesson.pk %}">{{ lesson.title }}</a></td>
+            <td>{{ lesson.project }}</td>
+            <td>{{ lesson.phase.code }}</td>
+            <td>{{ lesson.get_status_display }}</td>
+            <td>{{ lesson.submitted_at|date:"j M Y" }}</td>
+            <td>{{ lesson.reviewed_at|date:"j M Y"|default:"–" }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>You haven't submitted any lessons yet.</p>
+  {% endif %}
+  <p><a href="{% url 'submit_lesson' %}">Submit a lesson</a></p>
+{% endblock %}
