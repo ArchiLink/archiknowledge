@@ -17,6 +17,7 @@ from lessons.browse import (
     approved_lessons,
     feed_lessons,
 )
+from lessons.charts import chart_data, chart_years, period_from_params
 from lessons.export import ExportFilterForm, csv_response
 from lessons.forms import IncorporationForm, LessonSubmitForm, ReviewForm
 from lessons.models import Lesson, LessonImage, Phase
@@ -212,6 +213,8 @@ def dashboard(request):
     context = feed_context(request)
     if context is None:
         return render(request, "400.html", status=400)
+    period = period_from_params(request.GET)
+    context.update(period=period, chart=chart_data(period), years=chart_years())
     return render(request, "lessons/dashboard.html", context)
 
 

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
   <h1>Latest lessons</h1>
@@ -14,4 +15,33 @@
        hx-trigger="every 30s" hx-swap="innerHTML">
     {% include "lessons/_feed.html" %}
   </div>
+
+  <section aria-labelledby="charts-heading">
+    <h2 id="charts-heading">Issues by month and phase · {{ period.label }}</h2>
+    <form method="get" action="{% url 'dashboard' %}">
+      {% if phase %}<input type="hidden" name="phase" value="{{ phase.code }}">{% endif %}
+      <label>Year
+        <select name="year">
+          <option value="">Last 12 months</option>
+          {% for y in years %}<option value="{{ y }}"{% if period.kind == "year" and period.label == y|stringformat:"d" %} selected{% endif %}>{{ y }}</option>{% endfor %}
+        </select>
+      </label>
+      <label>or from <input type="month" name="from" value="{% if period.kind == "custom" %}{{ period.start|date:"Y-m" }}{% endif %}"></label>
+      <label>to <input type="month" name="to" value="{% if period.kind == "custom" %}{{ period.end|date:"Y-m" }}{% endif %}"></label>
+      <button type="submit">Show</button>
+    </form>
+    <p>{{ chart.total }} lesson{{ chart.total|pluralize }} in this period.</p>
+    <canvas id="chart-by-month" aria-label="Lessons per month, stacked by phase" role="img"></canvas>
+    <canvas id="chart-by-phase" aria-label="Total lessons per phase" role="img"></canvas>
+    <table>
+      <caption>Totals per phase</caption>
+      <thead><tr><th scope="col">Phase</th><th scope="col">Lessons</th></tr></thead>
+      <tbody>
+        {% for total in chart.totals %}<tr><td>{{ total.label }}</td><td>{{ total.count }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+    {{ chart|json_script:"chart-data" }}
+    <script src="{% static 'vendor/chartjs/chart-4.5.1.umd.min.js' %}" defer></script>
+    <script src="{% static 'js/charts.js' %}" defer></script>
+  </section>
 {% endblock %}
