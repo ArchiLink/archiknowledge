@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}{{ lesson.title }} · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <p><a href="{% url 'my_submissions' %}">← My submissions</a></p>
+  <h1>{{ lesson.title }}</h1>
+  <p>Status: <strong>{{ lesson.get_status_display }}</strong>
+    · submitted {{ lesson.submitted_at|date:"j M Y" }}
+    {% if lesson.reviewed_at %}· reviewed {{ lesson.reviewed_at|date:"j M Y" }}{% endif %}</p>
+  <dl>
+    <dt>Project</dt><dd>{{ lesson.project }}</dd>
+    <dt>Phase</dt><dd>{{ lesson.phase }}</dd>
+    <dt>Discipline</dt><dd>{{ lesson.discipline }}</dd>
+    <dt>Issue type</dt><dd>{{ lesson.issue_type }}</dd>
+    <dt>Building component</dt><dd>{{ lesson.building_component }}</dd>
+    <dt>Impact</dt><dd>{{ lesson.get_impact_display }}</dd>
+  </dl>
+  <h2>What happened</h2>
+  <p>{{ lesson.description|linebreaksbr }}</p>
+  <h2>Lesson</h2>
+  <p>{{ lesson.lesson|linebreaksbr }}</p>
+  {% for image in lesson.images.all %}
+    <figure>
+      <img src="{{ image.file.url }}" alt="{{ image.get_kind_display }} image" loading="lazy">
+      <figcaption>{{ image.get_kind_display }}</figcaption>
+    </figure>
+  {% endfor %}
+{% endblock %}
