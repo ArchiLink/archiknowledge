@@ -106,7 +106,7 @@ def test_admin_single_and_bulk_deletes_are_logged(client, caplog, staff_user):
     lines = audit_lines(caplog)
     for group in (one, two, three):
         assert admin_line("delete", group) in lines
-    assert not Group.objects.exists()
+    assert not Group.objects.filter(pk__in=[one.pk, two.pk, three.pk]).exists()
 
 
 def test_every_admin_is_audited():

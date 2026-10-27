@@ -36,6 +36,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Default-deny: every view needs login unless marked @login_not_required (SECURITY.md).
+    "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
@@ -53,6 +55,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "core.context_processors.portal",
             ],
         },
     },
@@ -71,10 +74,26 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+        "OPTIONS": {"min_length": 12},
+    },
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
+
+LOGIN_URL = "login"
+LOGIN_REDIRECT_URL = "/"
+LOGOUT_REDIRECT_URL = "login"
+
+# Sessions end after 10 hours of inactivity; cookie names are distinct because cookies
+# aren't isolated by port on a shared IP (SECURITY.md).
+SESSION_COOKIE_AGE = 10 * 60 * 60
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_NAME = "qp_session"
+CSRF_COOKIE_NAME = "qp_csrf"
+
+PORTAL_NAME = env.get_str("PORTAL_NAME", "Design Quality Log")
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = env.get_str("TIME_ZONE", "UTC")
