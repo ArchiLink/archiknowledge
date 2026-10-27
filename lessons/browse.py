@@ -8,6 +8,7 @@ from lessons.models import BuildingComponent, Discipline, IssueType, Lesson, Pha
 
 PAGE_SIZE = 20  # fixed on the server (SECURITY.md); no page_size parameter
 MAX_SEARCH_LENGTH = 200
+INCORPORATION_FLAGS = ["in_specs", "in_standard_details", "in_onboarding"]
 
 
 class LessonFilterForm(forms.Form):
@@ -21,6 +22,11 @@ class LessonFilterForm(forms.Form):
         queryset=BuildingComponent.objects.active(), required=False
     )
     impact = forms.ChoiceField(choices=[("", "Any impact"), *Lesson.Impact.choices], required=False)
+    incorporated = forms.ChoiceField(
+        label="Incorporation",
+        choices=[("", "Any"), ("no", "Not yet incorporated"), ("yes", "Incorporated somewhere")],
+        required=False,
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,6 +44,10 @@ class LessonFilterForm(forms.Form):
                 queryset = queryset.filter(**{name: data[name]})
         if data.get("impact"):
             queryset = queryset.filter(impact=data["impact"])
+        if data.get("incorporated") == "no":
+            queryset = queryset.filter(**{flag: False for flag in INCORPORATION_FLAGS})
+        elif data.get("incorporated") == "yes":
+            queryset = queryset.exclude(**{flag: False for flag in INCORPORATION_FLAGS})
         if data.get("q"):
             query = SearchQuery(data["q"], config="english", search_type="websearch")
             queryset = (

@@ -20,6 +20,20 @@
     <h2>Lesson</h2>
     <p>{{ lesson.lesson|linebreaksbr }}</p>
 
+    <h2>Incorporated into</h2>
+    <ul>
+      <li>Specifications: {{ lesson.in_specs|yesno:"Yes,Not yet" }}</li>
+      <li>Standard details: {{ lesson.in_standard_details|yesno:"Yes,Not yet" }}</li>
+      <li>Onboarding: {{ lesson.in_onboarding|yesno:"Yes,Not yet" }}</li>
+    </ul>
+    {% if incorporation_form %}
+      <form method="post" action="{% url 'update_incorporation' lesson.pk %}">
+        {% csrf_token %}
+        {{ incorporation_form.as_div }}
+        <button type="submit">Update incorporation</button>
+      </form>
+    {% endif %}
+
     {% for image in lesson.images.all %}
       <figure>
         <img src="{{ image.file.url }}" alt="{{ image.get_kind_display }} image" loading="lazy">

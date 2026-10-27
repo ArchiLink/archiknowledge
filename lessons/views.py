@@ -4,14 +4,14 @@ from django.core.paginator import Paginator
 from django.db import transaction
 from django.http import HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
-from django.views.decorators.http import require_GET, require_http_methods
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 from django.views.decorators.vary import vary_on_headers
 
 from core.audit import audit
 from core.roles import QA_GROUP, STAFF_GROUP, is_qa_reviewer
 from lessons import review
 from lessons.browse import PAGE_SIZE, LessonFilterForm, approved_lessons
-from lessons.forms import LessonSubmitForm, ReviewForm
+from lessons.forms import IncorporationForm, LessonSubmitForm, ReviewForm
 from lessons.models import Lesson, LessonImage
 
 
@@ -136,7 +136,27 @@ def lesson_detail(request, pk):
         .prefetch_related("images"),
         pk=pk,
     )
-    return render(request, "lessons/lesson_detail.html", {"lesson": lesson})
+    context = {"lesson": lesson}
+    if is_qa_reviewer(request.user):
+        context["incorporation_form"] = IncorporationForm(instance=lesson)
+    return render(request, "lessons/lesson_detail.html", context)
+
+
+@require_POST
+def update_incorporation(request, pk):
+    require_qa(request.user)
+    lesson = get_object_or_404(Lesson.objects.approved(), pk=pk)
+    form = IncorporationForm(request.POST, instance=lesson)
+    if form.is_valid() and form.has_changed():
+        form.save()
+        done = [name for name in form.Meta.fields if getattr(lesson, name)]
+        audit(
+            "incorporation_change",
+            request.user,
+            lesson_id=lesson.pk,
+            status=",".join(done) or "none",
+        )
+    return redirect("lesson_detail", pk=lesson.pk)
 
 
 @login_not_required

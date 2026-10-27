@@ -11,4 +11,9 @@ urlpatterns = [
     path("my-submissions/<int:pk>/", views.my_submission_detail, name="my_submission_detail"),
     path("review/", views.review_queue, name="review_queue"),
     path("review/<int:pk>/", views.review_lesson, name="review_lesson"),
+    path(
+        "review/<int:pk>/incorporation/",
+        views.update_incorporation,
+        name="update_incorporation",
+    ),
 ]
