@@ -3,6 +3,7 @@ from django.urls import path
 from lessons import views
 
 urlpatterns = [
+    path("lessons/<int:pk>/", views.lesson_detail, name="lesson_detail"),
     path("submit/", views.submit_lesson, name="submit_lesson"),
     path("submit/<int:pk>/done/", views.submit_done, name="submit_done"),
     path("my-submissions/", views.my_submissions, name="my_submissions"),
