@@ -28,6 +28,10 @@ USER app
 
 # Production image.
 FROM base AS runtime
+# Cron runner for the scheduler service (REQ-EMAIL-002), verified against its checksum.
+ADD --checksum=sha256:a53ae236602c7338aba3fbaff40bda6300eae3b9fedb8261eb06cfe3724430c1 --chmod=755 \
+    https://github.com/aptible/supercronic/releases/download/v0.2.49/supercronic-linux-amd64 \
+    /usr/local/bin/supercronic
 COPY --chown=app:app . .
 USER app
 EXPOSE 8000

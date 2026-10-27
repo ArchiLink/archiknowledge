@@ -210,3 +210,17 @@ class LessonImage(models.Model):
 
     def __str__(self):
         return f"{self.get_kind_display()} image for lesson {self.lesson_id}"
+
+
+class DigestRun(models.Model):
+    """A successful High-impact digest run; the next digest starts from the latest one."""
+
+    run_at = models.DateTimeField()
+    lesson_count = models.PositiveIntegerField()
+
+    class Meta:
+        ordering = ["-run_at"]
+        get_latest_by = "run_at"
+
+    def __str__(self):
+        return f"Digest of {self.run_at:%Y-%m-%d %H:%M} ({self.lesson_count} lessons)"

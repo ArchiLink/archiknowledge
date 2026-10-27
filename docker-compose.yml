@@ -16,6 +16,7 @@ x-django-env: &django-env
   EMAIL_HOST_PASSWORD: ${EMAIL_HOST_PASSWORD:-}
   EMAIL_USE_TLS: ${EMAIL_USE_TLS:-False}
   DEFAULT_FROM_EMAIL: ${DEFAULT_FROM_EMAIL:-}
+  QUALITY_ALERT_RECIPIENTS: ${QUALITY_ALERT_RECIPIENTS:-}
   POSTGRES_DB: ${POSTGRES_DB:?set in .env}
   POSTGRES_USER: ${POSTGRES_USER:?set in .env}
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set in .env}
@@ -67,6 +68,19 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    restart: unless-stopped
+    logging: *logging
+
+  # Runs send_digest weekly with --if-due (sends every 14 days); same image as web.
+  scheduler:
+    build:
+      context: .
+      target: runtime
+    environment: *django-env
+    command: ["supercronic", "/app/scheduler/crontab"]
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
     logging: *logging
 

@@ -1,0 +1,3 @@
+# supercronic schedule for the scheduler service (times are UTC).
+# Weekly on Monday at 06:00; send_digest --if-due sends only every 14 days (REQ-EMAIL-002).
+0 6 * * 1 python manage.py send_digest --if-due
