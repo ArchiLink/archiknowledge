@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Redline Gallery · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <h1>Redline Gallery</h1>
+  <form method="get" action="{% url 'gallery' %}" role="search">
+    {{ form.as_div }}
+    <button type="submit">Filter</button>
+  </form>
+  <p>{{ page.paginator.count }} lesson{{ page.paginator.count|pluralize }}</p>
+  {% for lesson in page %}
+    <article>
+      <h2><a href="{% url 'lesson_detail' lesson.pk %}">{{ lesson.title }}</a></h2>
+      <p>{{ lesson.phase.code }} · {{ lesson.discipline }} · {{ lesson.public_project }}</p>
+      <div class="redline-pair">
+        <figure>
+          {% if lesson.failed_image %}
+            <img src="{{ lesson.failed_image.file.url }}" alt="Failed: {{ lesson.title }}" loading="lazy">
+          {% else %}
+            <div class="placeholder">No Failed image</div>
+          {% endif %}
+          <figcaption>Failed</figcaption>
+        </figure>
+        <figure>
+          {% if lesson.fixed_image %}
+            <img src="{{ lesson.fixed_image.file.url }}" alt="Fixed: {{ lesson.title }}" loading="lazy">
+          {% else %}
+            <div class="placeholder">No Fixed image</div>
+          {% endif %}
+          <figcaption>Fixed</figcaption>
+        </figure>
+      </div>
+    </article>
+  {% empty %}
+    <p>No lessons with images match these filters.</p>
+  {% endfor %}
+  {% if page.has_other_pages %}
+    <nav aria-label="Pages">
+      {% if page.has_previous %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.previous_page_number }}">Previous</a>{% endif %}
+      Page {{ page.number }} of {{ page.paginator.num_pages }}
+      {% if page.has_next %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.next_page_number }}">Next</a>{% endif %}
+    </nav>
+  {% endif %}
+{% endblock %}

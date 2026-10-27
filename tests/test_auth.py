@@ -23,6 +23,7 @@ PUBLIC_VIEWS = {
     "dashboard",
     "feed",
     "embed_ticker",
+    "gallery",
 }
 
 
