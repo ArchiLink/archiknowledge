@@ -131,6 +131,23 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 # Uploaded images: a Docker volume in production, served only after an access check.
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+# Uploaded files get no execute bit (SECURITY.md). Static files are collected at build time
+# and must stay readable by the proxy's own user.
+FILE_UPLOAD_PERMISSIONS = 0o640
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o750
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "OPTIONS": {"file_permissions_mode": 0o644, "directory_permissions_mode": 0o755},
+    },
+}
+
+# Upload limits, enforced here and by Caddy's request size cap (SECURITY.md).
+MAX_UPLOAD_MB = env.get_int("MAX_UPLOAD_MB", 10)
+MAX_IMAGES_PER_LESSON = env.get_int("MAX_IMAGES_PER_LESSON", 6)
+FILE_UPLOAD_MAX_MEMORY_SIZE = MAX_UPLOAD_MB * 1024 * 1024
+DATA_UPLOAD_MAX_NUMBER_FILES = MAX_IMAGES_PER_LESSON
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 

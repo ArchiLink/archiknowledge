@@ -12,7 +12,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN groupadd --system app && useradd --system --gid app --home-dir /app app
 WORKDIR /app
-RUN chown app:app /app
+RUN mkdir /app/media && chown app:app /app /app/media
 
 COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
