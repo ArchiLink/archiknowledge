@@ -82,3 +82,11 @@ class LessonSubmitForm(forms.ModelForm):
                 raise ValidationError("Add at least one Failed or Fixed image.")
             check_image_count(len(images))
         return cleaned
+
+
+class IncorporationForm(forms.ModelForm):
+    """QA records where an Approved lesson has been incorporated (REQ-REVIEW-002)."""
+
+    class Meta:
+        model = Lesson
+        fields = ["in_specs", "in_standard_details", "in_onboarding"]
