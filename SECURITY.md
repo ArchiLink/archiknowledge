@@ -61,7 +61,7 @@ Security controls and accepted risks for the portal. Actors, components and depl
 - Before merging to `main`, run the test suite and `pip-audit` locally, and fix or note any findings in the PR.
 - Run `manage.py check --deploy` before each release. HTTPS, HSTS and secure-cookie warnings are expected; fix anything else.
 - Pin Python dependencies in a lockfile; pin base images to a specific tag; rebuild monthly and when security updates are released.
-- Run containers as a non-root user; mount uploaded media without execute permission.
+- Run containers as a non-root user. Store uploads without an execute bit (`0640`), only as re-encoded images, and serve them read-only through Caddy; Docker named volumes can't be mounted `noexec`.
 - Take a backup before applying migrations in production; test a restore quarterly.
 - Encrypt backups with `BACKUP_PASSPHRASE` and keep the passphrase somewhere other than the server.
 
