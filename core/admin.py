@@ -1,3 +1,5 @@
+from axes.admin import AccessAttemptAdmin, AccessFailureLogAdmin, AccessLogAdmin
+from axes.models import AccessAttempt, AccessFailureLog, AccessLog
 from django.contrib import admin
 from django.contrib.auth.admin import GroupAdmin, UserAdmin
 from django.contrib.auth.models import Group, User
@@ -47,4 +49,25 @@ class AuditedUserAdmin(AuditedAdmin, UserAdmin):
 
 @admin.register(Group)
 class AuditedGroupAdmin(AuditedAdmin, GroupAdmin):
+    pass
+
+
+# django-axes lockout records. Deleting an AccessAttempt unlocks that account early.
+admin.site.unregister(AccessAttempt)
+admin.site.unregister(AccessLog)
+admin.site.unregister(AccessFailureLog)
+
+
+@admin.register(AccessAttempt)
+class AuditedAccessAttemptAdmin(AuditedAdmin, AccessAttemptAdmin):
+    pass
+
+
+@admin.register(AccessLog)
+class AuditedAccessLogAdmin(AuditedAdmin, AccessLogAdmin):
+    pass
+
+
+@admin.register(AccessFailureLog)
+class AuditedAccessFailureLogAdmin(AuditedAdmin, AccessFailureLogAdmin):
     pass

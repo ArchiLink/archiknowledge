@@ -1,5 +1,6 @@
 """Django settings. Every value comes from the environment; see .env.example and SECURITY.md."""
 
+from datetime import timedelta
 from pathlib import Path
 
 from portal import env
@@ -27,7 +28,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "core",
+    "axes",
+    "core",  # after axes, so core.admin can wrap axes' admin classes
 ]
 
 MIDDLEWARE = [
@@ -40,6 +42,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.LoginRequiredMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",  # must be last
+]
+
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",  # must be first
+    "django.contrib.auth.backends.ModelBackend",
 ]
 
 ROOT_URLCONF = "portal.urls"
@@ -92,6 +100,21 @@ SESSION_COOKIE_AGE = 10 * 60 * 60
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_NAME = "qp_session"
 CSRF_COOKIE_NAME = "qp_csrf"
+
+# Lock an account (by username, not IP) for 15 minutes after 10 failed logins (SECURITY.md).
+# A locked account sees the same page and message as a wrong password.
+AXES_FAILURE_LIMIT = 10
+AXES_COOLOFF_TIME = timedelta(minutes=15)
+AXES_LOCKOUT_PARAMETERS = ["username"]
+# axes.W006 asks to also lock by IP. SECURITY.md locks the account; IP lockout would also
+# block the whole office behind one NAT address.
+SILENCED_SYSTEM_CHECKS = ["axes.W006"]
+AXES_RESET_ON_SUCCESS = True
+AXES_LOCKOUT_CALLABLE = "core.lockout.lockout_response"
+AXES_DISABLE_ACCESS_LOG = True  # successful logins are already in the audit log
+# Caddy replaces any client-sent X-Forwarded-For with the real client address.
+AXES_IPWARE_META_PRECEDENCE_ORDER = ["HTTP_X_FORWARDED_FOR", "REMOTE_ADDR"]
+AXES_IPWARE_PROXY_COUNT = 1
 
 PORTAL_NAME = env.get_str("PORTAL_NAME", "Design Quality Log")
 
