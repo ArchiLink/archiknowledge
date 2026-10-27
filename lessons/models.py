@@ -177,6 +177,14 @@ class Lesson(models.Model):
     def __str__(self):
         return self.title
 
+    ANONYMISED_PROJECT = "Project withheld"
+
+    @property
+    def public_project(self):
+        """Project name for anything outside the review queue: public pages, embed, emails,
+        CSV export. Use this instead of `project` so anonymised names never leak (SECURITY.md)."""
+        return self.ANONYMISED_PROJECT if self.anonymise else self.project.name
+
 
 ALLOWED_IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp"}
 

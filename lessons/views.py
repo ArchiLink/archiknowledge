@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_not_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseBadRequest
@@ -120,3 +121,16 @@ def review_lesson(request, pk):
                 return redirect("review_lesson", pk=lesson.pk)
             return redirect("review_queue")
     return render(request, "lessons/review_lesson.html", {"form": form, "lesson": lesson})
+
+
+@login_not_required
+@require_GET
+def lesson_detail(request, pk):
+    """Public permalink for an Approved lesson; anything else is a 404."""
+    lesson = get_object_or_404(
+        Lesson.objects.approved()
+        .select_related("project", "phase", "discipline", "issue_type", "building_component")
+        .prefetch_related("images"),
+        pk=pk,
+    )
+    return render(request, "lessons/lesson_detail.html", {"lesson": lesson})

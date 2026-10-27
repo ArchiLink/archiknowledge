@@ -13,7 +13,7 @@ PASSWORD = "a-long-enough-passphrase"
 
 # Every view reachable without login. Add a name here only for the public read-only views
 # listed in SECURITY.md (dashboard, knowledge base, gallery, lesson detail, embed, /health/).
-PUBLIC_VIEWS = {"health", "login", "admin:login", "media_auth"}
+PUBLIC_VIEWS = {"health", "login", "admin:login", "media_auth", "lesson_detail"}
 
 
 def iter_patterns(patterns, namespace=""):
