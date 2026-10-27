@@ -10,7 +10,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     UV_PROJECT_ENVIRONMENT=/opt/venv \
     PATH="/opt/venv/bin:$PATH"
 
-RUN groupadd --system app && useradd --system --gid app --home-dir /app app
+# Fixed IDs: the proxy image joins group 1000 to read uploaded media (files are 0640).
+RUN groupadd --system --gid 1000 app && useradd --system --uid 1000 --gid app --home-dir /app app
 WORKDIR /app
 RUN mkdir /app/media && chown app:app /app /app/media
 
@@ -43,7 +44,9 @@ RUN DJANGO_SECRET_KEY=collectstatic-only POSTGRES_PASSWORD=collectstatic-only \
 
 # Caddy proxy with the static files baked in, so they can't go stale on a shared volume.
 FROM caddy:2.11.7-alpine AS proxy
-RUN addgroup -S proxy && adduser -S -G proxy proxy && chown -R proxy:proxy /data /config
+RUN addgroup -S -g 1000 app && addgroup -S -g 1001 proxy \
+    && adduser -S -u 1001 -G proxy proxy && addgroup proxy app \
+    && chown -R proxy:proxy /data /config
 COPY proxy/Caddyfile /etc/caddy/Caddyfile
 COPY proxy/entrypoint.sh /usr/local/bin/proxy-entrypoint
 COPY --from=static /app/staticfiles /srv/static

@@ -58,6 +58,22 @@
 		file_server
 	}
 
+	# Uploaded images: Django decides who may see each file (REQ-MEDIA-002).
+	handle /media/* {
+		import deny_framing
+		forward_auth web:8000 {
+			uri /internal/media-auth/
+		}
+		root * /srv
+		file_server
+	}
+
+	# Internal endpoints are for Caddy only.
+	handle /internal/* {
+		import deny_framing
+		respond 404
+	}
+
 	handle {
 		import deny_framing
 		reverse_proxy web:8000
