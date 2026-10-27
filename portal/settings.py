@@ -128,6 +128,15 @@ EMAIL_HOST_PASSWORD = env.get_str("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = env.get_bool("EMAIL_USE_TLS", default=False)
 EMAIL_TIMEOUT = 10
 DEFAULT_FROM_EMAIL = env.get_str("DEFAULT_FROM_EMAIL") or "portal@localhost"
+# Fortnightly High-impact digest (REQ-EMAIL-002).
+QUALITY_ALERT_RECIPIENTS = [
+    address.strip()
+    for address in env.get_str("QUALITY_ALERT_RECIPIENTS").split(",")
+    if address.strip()
+]
+DIGEST_INTERVAL_DAYS = 14
+# Absolute links in emails sent outside a request (the digest).
+PORTAL_BASE_URL = CSRF_TRUSTED_ORIGINS[0]
 
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = env.get_str("TIME_ZONE", "UTC")

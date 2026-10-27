@@ -1,0 +1,8 @@
+{% autoescape off %}Quality Alert: high-impact lessons published since {{ since|date:"j M Y" }}.
+{% for item in items %}
+{{ forloop.counter }}. {{ item.lesson.title }}
+   {{ item.lesson.phase.code }} · {{ item.lesson.discipline }} · {{ item.lesson.public_project }}
+   {{ item.url }}
+{% endfor %}
+Read every lesson in the knowledge base on {{ portal_name }}.
+{% endautoescape %}
