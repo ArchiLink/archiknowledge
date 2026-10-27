@@ -3,6 +3,8 @@ from django.urls import path
 from lessons import views
 
 urlpatterns = [
+    path("", views.dashboard, name="dashboard"),
+    path("feed/", views.feed, name="feed"),
     path("knowledge/", views.knowledge_base, name="knowledge_base"),
     path("lessons/<int:pk>/", views.lesson_detail, name="lesson_detail"),
     path("submit/", views.submit_lesson, name="submit_lesson"),

@@ -64,3 +64,28 @@ def approved_lessons():
     return Lesson.objects.approved().select_related(
         "project", "phase", "discipline", "issue_type", "building_component"
     )
+
+
+FEED_SIZE = 20
+
+
+class FeedFilterForm(forms.Form):
+    """Dashboard feed filter: an active phase code such as "SD" (REQ-FEED-001)."""
+
+    phase = forms.CharField(required=False, max_length=10)
+
+    def clean_phase(self):
+        code = self.cleaned_data["phase"]
+        if not code:
+            return None
+        phase = Phase.objects.active().filter(code__iexact=code).first()
+        if phase is None:
+            raise forms.ValidationError("Unknown phase.")
+        return phase
+
+
+def feed_lessons(phase=None):
+    lessons = approved_lessons().order_by("-approved_at")
+    if phase is not None:
+        lessons = lessons.filter(phase=phase)
+    return lessons[:FEED_SIZE]
