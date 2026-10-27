@@ -226,3 +226,15 @@ def feed(request):
     if context is None:
         return render(request, "400.html", status=400)
     return render(request, "lessons/_feed.html", context)
+
+
+TICKER_SIZE = 10
+
+
+@login_not_required
+@require_GET
+def embed_ticker(request):
+    """Compact feed for the WordPress iframe. Framing is allowed by Caddy only for /embed/*
+    and only when FRAME_ANCESTORS is set (REQ-OPS-004)."""
+    lessons = approved_lessons().order_by("-approved_at")[:TICKER_SIZE]
+    return render(request, "lessons/embed_ticker.html", {"lessons": lessons})
