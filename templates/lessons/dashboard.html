@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <h1>Latest lessons</h1>
+  <nav aria-label="Filter by phase">
+    <a href="{% url 'dashboard' %}"{% if not phase %} aria-current="page"{% endif %}>All phases</a>
+    {% for p in phases %}
+      <a href="?phase={{ p.code }}" title="{{ p.name }}"{% if phase == p %} aria-current="page"{% endif %}>{{ p.code }}</a>
+    {% endfor %}
+  </nav>
+  {# Re-polls every 30 s; on an error HTMX keeps the last content (REQ-FEED-001). #}
+  <div id="feed"
+       hx-get="{% url 'feed' %}{% if phase %}?phase={{ phase.code }}{% endif %}"
+       hx-trigger="every 30s" hx-swap="innerHTML">
+    {% include "lessons/_feed.html" %}
+  </div>
+{% endblock %}

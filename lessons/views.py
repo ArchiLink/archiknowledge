@@ -10,10 +10,16 @@ from django.views.decorators.vary import vary_on_headers
 from core.audit import audit
 from core.roles import QA_GROUP, STAFF_GROUP, is_qa_reviewer
 from lessons import review
-from lessons.browse import PAGE_SIZE, LessonFilterForm, approved_lessons
+from lessons.browse import (
+    PAGE_SIZE,
+    FeedFilterForm,
+    LessonFilterForm,
+    approved_lessons,
+    feed_lessons,
+)
 from lessons.export import ExportFilterForm, csv_response
 from lessons.forms import IncorporationForm, LessonSubmitForm, ReviewForm
-from lessons.models import Lesson, LessonImage
+from lessons.models import Lesson, LessonImage, Phase
 
 
 def require_staff(user):
@@ -189,3 +195,31 @@ def export_lessons(request):
     response, count = csv_response(form.lessons(), request)
     audit("export", request.user, count=count)
     return response
+
+
+def feed_context(request):
+    """Validated feed context, or None when the phase parameter is invalid."""
+    form = FeedFilterForm(request.GET)
+    if not form.is_valid():
+        return None
+    phase = form.cleaned_data["phase"]
+    return {"phase": phase, "lessons": feed_lessons(phase), "phases": Phase.objects.active()}
+
+
+@login_not_required
+@require_GET
+def dashboard(request):
+    context = feed_context(request)
+    if context is None:
+        return render(request, "400.html", status=400)
+    return render(request, "lessons/dashboard.html", context)
+
+
+@login_not_required
+@require_GET
+def feed(request):
+    """The feed fragment the dashboard re-requests every 30 seconds."""
+    context = feed_context(request)
+    if context is None:
+        return render(request, "400.html", status=400)
+    return render(request, "lessons/_feed.html", context)

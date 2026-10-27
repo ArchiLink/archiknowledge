@@ -1,0 +1,11 @@
+{% for lesson in lessons %}
+  <article>
+    <h2><a href="{% url 'lesson_detail' lesson.pk %}">{{ lesson.title }}</a></h2>
+    <p><abbr title="{{ lesson.phase.name }}">{{ lesson.phase.code }}</abbr>
+      · {{ lesson.discipline }} · {{ lesson.get_impact_display }} impact
+      · {{ lesson.public_project }} · {{ lesson.approved_at|date:"j M Y" }}</p>
+    <p>{{ lesson.lesson|truncatewords:30 }}</p>
+  </article>
+{% empty %}
+  <p>No lessons published{% if phase %} for {{ phase.name }}{% endif %} yet.</p>
+{% endfor %}
