@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: SECURITY.md.
+How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: SECURITY.md. Install, release and rollback on the VM: RUNBOOK.md.
 
 @ARCHITECTURE.md
 @SECURITY.md
@@ -33,7 +33,7 @@ How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: S
 - Account lockout: django-axes. Scheduler: supercronic inside the `web` image. Backups: whole-VM snapshots by the server team (no backup service).
 
 - Branch: `req/<REQ-ID>-short-name`. Commit: `<REQ-ID>: imperative summary`, with `Closes #N` in the PR.
-- Release/deploy procedure on the intranet machine: to be written in REQ-OPS-007.
+- Release: run the RUNBOOK.md release checklist, then tag `v<X.Y.Z>` on `main`; deploy and roll back per RUNBOOK.md.
 
 ## Commands
 - Test (pytest in a throwaway Postgres stack; fails under 80% branch coverage): `docker compose -f docker-compose.test.yml run --rm --build test`
