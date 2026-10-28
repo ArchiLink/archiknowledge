@@ -1,20 +1,25 @@
-"""Demo lessons for showcasing the portal (REQ-OPS-009).
+"""Demo lessons and logins for showcasing the portal (REQ-OPS-009, REQ-OPS-010).
 
-Everything is owned by two demo users that can't sign in, so `remove()` deletes exactly the
+The lessons are owned by two demo users that can't sign in, so `remove()` deletes exactly the
 demo data and nothing real. Images are drawn with Pillow and saved through process_image, like
-an upload.
+an upload. The optional demo logins (Staff and Management) get random passwords; the Admin role
+is shown with the presenter's own named superuser, never a shared account (SECURITY.md).
 """
 
 import io
+import secrets
 from datetime import timedelta
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
+from django.contrib.auth.password_validation import validate_password
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import transaction
 from django.utils import timezone
 from PIL import Image, ImageDraw, ImageFont
 
 from core.audit import audit
+from core.roles import QA_GROUP, STAFF_GROUP
 from lessons.images import process_image
 from lessons.models import (
     BuildingComponent,
@@ -28,6 +33,11 @@ from lessons.models import (
 
 DEMO_STAFF = "demo-staff"
 DEMO_QA = "demo-qa"
+# Sign-in accounts for the showcase: username -> (first name, last name, group).
+DEMO_LOGINS = {
+    "demo.staff": ("Demo", "Staff member", STAFF_GROUP),
+    "demo.manager": ("Demo", "Manager", QA_GROUP),
+}
 DEMO_PROJECTS = [
     "Riverside Public Library",
     "Harbour View Condominiums",
@@ -204,6 +214,15 @@ def _lookup(model, name):
     return model.objects.filter(name=name).first() or model.objects.active().first()
 
 
+class DemoInUse(Exception):
+    """The demo can't be removed without touching real data."""
+
+
+def _demo_users():
+    names = [DEMO_STAFF, DEMO_QA, *DEMO_LOGINS]
+    return get_user_model().objects.filter(username__in=names)
+
+
 def is_loaded():
     return get_user_model().objects.filter(username__in=[DEMO_STAFF, DEMO_QA]).exists()
 
@@ -270,11 +289,32 @@ def load():
 
 
 @transaction.atomic
-def remove():
-    """Delete the demo lessons, their image files, demo projects and demo users."""
+def create_logins():
+    """Create or reset the demo logins with new random passwords. Returns {username: password}."""
     User = get_user_model()
-    users = User.objects.filter(username__in=[DEMO_STAFF, DEMO_QA])
+    passwords = {}
+    for username, (first, last, group) in DEMO_LOGINS.items():
+        user, _ = User.objects.get_or_create(username=username)
+        user.first_name, user.last_name = first, last
+        user.is_staff = user.is_superuser = False
+        password = secrets.token_urlsafe(12)
+        validate_password(password, user)
+        user.set_password(password)
+        user.save()
+        user.groups.set([Group.objects.get(name=group)])
+        passwords[username] = password
+    audit("demo_logins", count=len(passwords))
+    return passwords
+
+
+@transaction.atomic
+def remove():
+    """Delete the demo lessons and anything the demo logins submitted, their image files, demo
+    projects and all demo users."""
+    users = _demo_users()
     lessons = Lesson.objects.filter(submitted_by__in=users)
+    if Lesson.objects.filter(reviewed_by__in=users).exclude(pk__in=lessons).exists():
+        raise DemoInUse("demo.manager reviewed a real lesson; reassign it before removing.")
     count = lessons.count()
     for image in LessonImage.objects.filter(lesson__in=lessons):
         image.file.delete(save=False)

@@ -159,3 +159,92 @@ def test_load_and_remove_audited(settings, caplog):
     count = len(demo.LESSONS)
     assert f'event=demo_load user="-" count="{count}"' in audit_lines(caplog)
     assert f'event=demo_remove user="-" count="{count}"' in audit_lines(caplog)
+
+
+# REQ-OPS-010: demo logins for the Staff and Management roles.
+
+
+def login_lines(output):
+    return dict(line.split() for line in output.splitlines() if line.startswith("  demo."))
+
+
+@pytest.fixture
+def with_logins(settings, capsys):
+    settings.EMAIL_HOST = ""
+    call_command("demo_data", "--logins")
+    return login_lines(capsys.readouterr().out)
+
+
+def test_logins_created_with_roles_and_no_admin_flags(with_logins):
+    # AC-01
+    assert set(with_logins) == {"demo.staff", "demo.manager"}
+    users = get_user_model().objects
+    staff, manager = users.get(username="demo.staff"), users.get(username="demo.manager")
+    assert list(staff.groups.values_list("name", flat=True)) == ["Staff"]
+    assert list(manager.groups.values_list("name", flat=True)) == ["QA Reviewers"]
+    for user in (staff, manager):
+        assert not user.is_staff and not user.is_superuser
+    assert Lesson.objects.count() == len(demo.LESSONS)  # lessons loaded too
+
+
+def test_logins_added_when_lessons_already_loaded(loaded, capsys):
+    # AC-01: --logins on top of an existing demo adds only the logins.
+    call_command("demo_data", "--logins")
+    out = capsys.readouterr().out
+    assert "Loaded" not in out and "demo.manager" in out
+    assert Lesson.objects.count() == len(demo.LESSONS)
+
+
+def test_logins_work_for_their_roles_only(with_logins):
+    # AC-01 / security: each login reaches its own pages and nothing more.
+    staff, manager = Client(), Client()
+    # Through the real login page: django-axes needs a request to authenticate.
+    for client, username in [(staff, "demo.staff"), (manager, "demo.manager")]:
+        response = client.post(
+            "/accounts/login/", {"username": username, "password": with_logins[username]}
+        )
+        assert response.status_code == 302, username
+    assert staff.get("/submit/").status_code == 200
+    assert staff.get("/review/").status_code == 403
+    assert manager.get("/review/").status_code == 200
+    assert manager.get("/admin/").status_code == 302  # not an admin: sent to the admin login
+
+
+def test_passwords_valid_rotated_and_not_logged(settings, capsys, caplog):
+    # AC-02 and AC-04
+    from django.contrib.auth.password_validation import validate_password
+
+    settings.EMAIL_HOST = ""
+    with caplog.at_level(logging.INFO):
+        call_command("demo_data", "--logins")
+        first = login_lines(capsys.readouterr().out)
+        call_command("demo_data", "--logins")
+        second = login_lines(capsys.readouterr().out)
+    users = get_user_model().objects
+    for username, password in second.items():
+        assert password != first[username]
+        validate_password(password, users.get(username=username))
+        assert users.get(username=username).check_password(password)
+    logged = " ".join(r.getMessage() for r in caplog.records)
+    assert not any(p in logged for p in [*first.values(), *second.values()])
+    assert 'event=demo_logins user="-" count="2"' in audit_lines(caplog)
+
+
+def test_remove_deletes_logins_and_their_submissions(with_logins, make_lesson):
+    # AC-03
+    staff = get_user_model().objects.get(username="demo.staff")
+    make_lesson(title="Typed during the demo", submitted_by=staff)
+    call_command("demo_data", "--remove")
+    assert not Lesson.objects.exists()
+    assert not get_user_model().objects.filter(username__startswith="demo.").exists()
+
+
+def test_remove_refuses_if_manager_reviewed_real_lesson(with_logins, make_lesson):
+    # AC-03: nothing is removed rather than touching real data.
+    manager = get_user_model().objects.get(username="demo.manager")
+    real = make_lesson(title="Real lesson")
+    Lesson.objects.filter(pk=real.pk).update(reviewed_by=manager)
+    with pytest.raises(CommandError, match="reviewed a real lesson"):
+        call_command("demo_data", "--remove")
+    assert get_user_model().objects.filter(username="demo.manager").exists()
+    assert Lesson.objects.count() == len(demo.LESSONS) + 1

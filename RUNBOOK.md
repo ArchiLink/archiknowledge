@@ -78,8 +78,10 @@ docker compose up -d
 For showcasing before real lessons exist. Loads 14 demo lessons with Failed/Fixed drawings (11 published, 2 in the review queue, 1 rejected), owned by demo users that can't sign in:
 ```sh
 docker compose exec web python manage.py demo_data            # load
+docker compose exec web python manage.py demo_data --logins   # also add demo sign-ins
 docker compose exec web python manage.py demo_data --remove   # remove; real data is kept
 ```
+`--logins` creates `demo.staff` (Staff) and `demo.manager` (QA Reviewers) and prints their random passwords once; run it again to get new ones. Neither has admin rights. Show the Admin role with your own named superuser: shared admin accounts are not allowed (SECURITY.md). `--remove` also deletes the demo sign-ins and anything they submitted.
 Remove the demo before turning email on: loading refuses while `EMAIL_HOST` is set, so the digest can't send demo lessons to staff.
 
 ## Checks after a deploy
