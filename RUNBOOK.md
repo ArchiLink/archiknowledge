@@ -74,6 +74,14 @@ docker compose up -d
 - **The new release added no migrations** (`git diff --stat <old tag> <new tag> -- '*/migrations/'` is empty): `git checkout <old tag> && docker compose up -d --build`.
 - **It did add migrations**: ask the server team to restore the VM snapshot taken before the upgrade. Anything submitted since that snapshot is lost, so tell QA Reviewers.
 
+## Demo data
+For showcasing before real lessons exist. Loads 14 demo lessons with Failed/Fixed drawings (11 published, 2 in the review queue, 1 rejected), owned by demo users that can't sign in:
+```sh
+docker compose exec web python manage.py demo_data            # load
+docker compose exec web python manage.py demo_data --remove   # remove; real data is kept
+```
+Remove the demo before turning email on: loading refuses while `EMAIL_HOST` is set, so the digest can't send demo lessons to staff.
+
 ## Checks after a deploy
 1. All services are `Up` and `healthy`: `docker compose ps`
 2. Health check answers `ok`: `curl -fsS http://<PORTAL_ADDRESS>:<PORTAL_PORT>/health/`
