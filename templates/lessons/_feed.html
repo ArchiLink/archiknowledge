@@ -1,14 +1,5 @@
 {% for lesson in lessons %}
-  <article class="lesson-card">
-    <div class="lesson-tags">
-      <abbr class="badge badge-phase" title="{{ lesson.phase.name }}">{{ lesson.phase.code }}</abbr>
-      <span class="badge impact-{{ lesson.impact }}">{{ lesson.get_impact_display }} impact</span>
-      <time datetime="{{ lesson.approved_at|date:'Y-m-d' }}">{{ lesson.approved_at|date:"j M Y" }}</time>
-    </div>
-    <h2><a href="{% url 'lesson_detail' lesson.pk %}">{{ lesson.title }}</a></h2>
-    <p class="lesson-context">{{ lesson.discipline }} · {{ lesson.public_project }}</p>
-    <p>{{ lesson.lesson|truncatewords:30 }}</p>
-  </article>
+  {% include "lessons/_lesson_card.html" %}
 {% empty %}
   <p class="empty-state">No lessons published{% if phase %} for {{ phase.name }}{% endif %} yet.</p>
 {% endfor %}

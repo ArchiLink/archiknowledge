@@ -1,0 +1,14 @@
+{# Search box (when the form has one) above a grid of filters; shared by the knowledge base and gallery. #}
+{% if form.q %}
+  <div class="filter-search">
+    <label for="{{ form.q.id_for_label }}" class="visually-hidden">{{ form.q.label }}</label>
+    {{ form.q }}
+    <button type="submit">{{ submit_label|default:"Search" }}</button>
+  </div>
+{% endif %}
+<div class="filter-grid">
+  {% for field in form %}
+    {% if field.name != "q" %}<label>{{ field.label }} {{ field }}</label>{% endif %}
+  {% endfor %}
+</div>
+{% if not form.q %}<button type="submit" class="secondary">{{ submit_label|default:"Filter" }}</button>{% endif %}

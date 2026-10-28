@@ -3,13 +3,18 @@
 {% block title %}Knowledge base · {{ portal_name }}{% endblock %}
 
 {% block content %}
-  <h1>Knowledge base</h1>
-  <form method="get" action="{% url 'knowledge_base' %}" role="search"
-        hx-get="{% url 'knowledge_base' %}" hx-target="#results" hx-push-url="true"
-        hx-trigger="change, submit, input changed delay:400ms from:input[name=q]">
-    {{ form.as_div }}
-    <button type="submit">Search</button>
-  </form>
+  <div class="page-head">
+    <h1>Knowledge base</h1>
+    <p class="lede">Search every approved lesson, or narrow it down by phase, discipline and more.</p>
+  </div>
+  {# <search> rather than role="search": Pico styles role="search" as a single-line pill. #}
+  <search class="filter-panel">
+    <form method="get" action="{% url 'knowledge_base' %}"
+          hx-get="{% url 'knowledge_base' %}" hx-target="#results" hx-push-url="true"
+          hx-trigger="change, submit, input changed delay:400ms from:input[name=q]">
+      {% include "lessons/_filter_fields.html" %}
+    </form>
+  </search>
   <div id="results">
     {% include "lessons/_kb_results.html" %}
   </div>
