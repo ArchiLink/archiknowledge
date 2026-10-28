@@ -758,3 +758,54 @@ body.ticker {
   border-radius: calc(var(--pico-border-radius) - 2px);
   background: var(--brand-surface);
 }
+
+/* --- Redline Gallery (REQ-UI-005); image columns are shared with the detail page --- */
+.gallery-entry {
+  margin-bottom: 1.5rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+}
+
+.gallery-entry header {
+  margin-bottom: 1rem;
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.gallery-entry h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+}
+
+.gallery-entry h2 a {
+  color: var(--brand-ink);
+  text-decoration: none;
+}
+
+.gallery-entry h2 a:hover {
+  color: var(--brand-red);
+  text-decoration: underline;
+}
+
+.gallery-entry .lesson-context {
+  margin-bottom: 0;
+}
+
+.gallery-entry .image-column {
+  box-shadow: none;
+  border-right: 1px solid var(--brand-line);
+  border-bottom: 1px solid var(--brand-line);
+  border-left: 1px solid var(--brand-line);
+}
+
+.image-column .placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 3 / 2;
+  border: 1px dashed var(--brand-line);
+  border-radius: calc(var(--pico-border-radius) - 2px);
+  background: var(--brand-surface);
+  color: var(--brand-grey);
+  font-size: 0.875rem;
+}
