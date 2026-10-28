@@ -30,7 +30,7 @@ How to work in this repo. What the portal is: ARCHITECTURE.md. Security rules: S
 - Dependencies: uv, locked in `uv.lock`.
 - Tests: pytest + pytest-django; ≥ 80% branch coverage per the requirement template.
 - Lint/format: ruff for both.
-- Account lockout: django-axes. Scheduler: supercronic inside the `web` image. Backup encryption: `age`.
+- Account lockout: django-axes. Scheduler: supercronic inside the `web` image. Backups: whole-VM snapshots by the server team (no backup service).
 
 - Branch: `req/<REQ-ID>-short-name`. Commit: `<REQ-ID>: imperative summary`, with `Closes #N` in the PR.
 - Release/deploy procedure on the intranet machine: to be written in REQ-OPS-007.
