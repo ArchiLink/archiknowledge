@@ -1,9 +1,25 @@
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><title>Something went wrong</title></head>
+{% load static %}<!doctype html>
+{# Standalone on purpose: rendered without request context, and must work when the rest is broken. #}
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <title>Something went wrong</title>
+  <link rel="stylesheet" href="{% static 'vendor/pico/pico-2.1.1.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/portal.css' %}">
+</head>
 <body>
-  <h1>Something went wrong</h1>
-  <p>The error has been logged. Please try again later.</p>
-  <p><a href="/">Back to the portal</a></p>
+  <header class="site-header">
+    <div class="container header-top">
+      <a href="/" class="brand"><img src="{% static 'img/architecttura-logo.png' %}" alt="architecttura" width="727" height="95"></a>
+    </div>
+  </header>
+  <main class="container">
+    <section class="error-page">
+      <p class="error-code">500</p>
+      <h1>Something went wrong</h1>
+      <p>The error has been logged. Please try again later.</p>
+      <p><a href="/" role="button">Back to the portal</a></p>
+    </section>
+  </main>
 </body>
 </html>

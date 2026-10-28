@@ -1,0 +1,236 @@
+/*
+ * Portal theme on top of Pico CSS 2.1.1 (REQ-UI-002).
+ * Brand from the architecttura logo: red #D22930 on white, near-black text.
+ * No data: URIs, inline styles or external hosts: the CSP allows 'self' only (SECURITY.md).
+ */
+
+/* --- Brand tokens ---
+ * :root[data-theme="light"] matches Pico's own light-theme selector weight and loads after it. */
+:root[data-theme="light"] {
+  --brand-red: #d22930;
+  --brand-red-dark: #a91f25;
+  --brand-ink: #1d1d1f;
+  --brand-grey: #6b6f76;
+  --brand-line: #e3e5e8;
+  --brand-surface: #f6f7f8;
+
+  --pico-font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --pico-border-radius: 0.375rem;
+  --pico-color: var(--brand-ink);
+  --pico-h1-color: var(--brand-ink);
+  --pico-h2-color: var(--brand-ink);
+  --pico-h3-color: var(--brand-ink);
+  --pico-muted-color: var(--brand-grey);
+  --pico-muted-border-color: var(--brand-line);
+
+  --pico-primary: var(--brand-red);
+  --pico-primary-background: var(--brand-red);
+  --pico-primary-border: var(--brand-red);
+  --pico-primary-underline: rgba(210, 41, 48, 0.4);
+  --pico-primary-hover: var(--brand-red-dark);
+  --pico-primary-hover-background: var(--brand-red-dark);
+  --pico-primary-hover-border: var(--brand-red-dark);
+  --pico-primary-hover-underline: var(--brand-red-dark);
+  --pico-primary-focus: rgba(210, 41, 48, 0.3);
+  --pico-primary-inverse: #fff;
+
+  /* Pico's form icons, served as files instead of data: URIs so the CSP can stay img-src 'self'.
+     Absolute paths: a url() in a variable resolves against the stylesheet that uses it (Pico's). */
+  --pico-icon-checkbox: url("/static/vendor/pico/icons/checkbox.svg");
+  --pico-icon-minus: url("/static/vendor/pico/icons/minus.svg");
+  --pico-icon-chevron: url("/static/vendor/pico/icons/chevron.svg");
+  --pico-icon-date: url("/static/vendor/pico/icons/date.svg");
+  --pico-icon-time: url("/static/vendor/pico/icons/time.svg");
+  --pico-icon-search: url("/static/vendor/pico/icons/search.svg");
+  --pico-icon-close: url("/static/vendor/pico/icons/close.svg");
+  --pico-icon-loading: url("/static/vendor/pico/icons/loading.svg");
+  --pico-icon-valid: url("/static/vendor/pico/icons/valid.svg");
+  --pico-icon-invalid: url("/static/vendor/pico/icons/invalid.svg");
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--brand-surface);
+}
+
+main.container {
+  flex: 1;
+  padding-block: 2rem;
+}
+
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.brand-red {
+  color: var(--brand-red);
+}
+
+/* --- Header: logo and account on top, navigation strip below --- */
+.site-header {
+  background: #fff;
+  border-bottom: 3px solid var(--brand-red);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding-block: 1rem;
+}
+
+.site-header .brand {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  text-decoration: none;
+}
+
+.site-header .brand img {
+  height: 30px;
+  width: auto;
+}
+
+.site-header .brand-name {
+  padding-left: 0.9rem;
+  border-left: 1px solid var(--brand-line);
+  color: var(--brand-grey);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.header-top .account {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--brand-grey);
+  font-size: 0.875rem;
+  white-space: nowrap;
+}
+
+.header-top .account form {
+  margin: 0;
+}
+
+.header-top .account button,
+.header-top .account [role="button"] {
+  padding: 0.35rem 0.9rem;
+  font-size: 0.875rem;
+  margin: 0;
+}
+
+.site-nav {
+  border-top: 1px solid var(--brand-line);
+}
+
+.site-nav ul.container {
+  display: flex;
+  gap: 0.25rem;
+  margin: 0 auto; /* undo Pico's negative margin on a nav's first list */
+  padding-block: 0;
+}
+
+.site-nav li {
+  padding: 0;
+}
+
+.site-nav a {
+  display: block;
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0;
+  color: var(--brand-ink);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.site-nav li:first-child a {
+  padding-left: 0;
+}
+
+.site-nav a:hover {
+  color: var(--brand-red);
+}
+
+.site-nav a[aria-current="page"] {
+  color: var(--brand-red);
+  box-shadow: inset 0 -3px 0 var(--brand-red);
+}
+
+/* --- Footer --- */
+.site-footer {
+  background: var(--brand-ink);
+  color: #c9ccd1;
+  font-size: 0.8125rem;
+  padding-block: 1rem;
+}
+
+.site-footer .container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.site-footer strong {
+  color: #fff;
+}
+
+.site-footer .brand-red {
+  color: #ff6b70;
+}
+
+/* --- Notices --- */
+[role="note"],
+[role="alert"] {
+  padding: 0.75rem 1rem;
+  border-left: 4px solid var(--brand-grey);
+  border-radius: var(--pico-border-radius);
+  background: #fff;
+}
+
+[role="note"] {
+  border-left-color: #d99a00;
+  background: #fff8e6;
+}
+
+[role="alert"] {
+  border-left-color: var(--brand-red);
+  background: #fdecec;
+}
+
+/* --- Sign-in and error pages --- */
+.narrow-card {
+  max-width: 30rem;
+  margin: 1rem auto;
+}
+
+.narrow-card .full-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin-bottom: 1.5rem;
+}
+
+.narrow-card button[type="submit"] {
+  width: 100%;
+}
+
+.error-page {
+  max-width: 36rem;
+  margin: 3rem auto;
+  text-align: center;
+}
+
+.error-page .error-code {
+  color: var(--brand-red);
+  font-size: 3.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}

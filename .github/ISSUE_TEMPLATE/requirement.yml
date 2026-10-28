@@ -8,7 +8,7 @@ body:
       value: |
         Read [ARCHITECTURE.md](../blob/main/ARCHITECTURE.md) and [SECURITY.md](../blob/main/SECURITY.md) before filling this in.
         Module codes for the ID: `AUTH` (login, roles), `SUBMIT` (submission form), `REVIEW` (QA queue), `FEED` (dashboard/ticker), `KB` (knowledge base),
-        `GALLERY` (Redline Gallery), `LESSON` (detail page), `MEDIA` (uploads), `EMAIL` (notifications/digest), `ADMIN` (lookups, users), `OPS` (deployment, operations).
+        `GALLERY` (Redline Gallery), `LESSON` (detail page), `MEDIA` (uploads), `EMAIL` (notifications/digest), `ADMIN` (lookups, users), `OPS` (deployment, operations), `UI` (site-wide layout and styling).
 
   # --- Metadata ---
   - type: markdown
@@ -143,6 +143,7 @@ body:
         - Admin & lookup lists
         - Embed (/embed/ticker/)
         - Deployment
+        - Site-wide layout & styling
     validations:
       required: true
   - type: dropdown

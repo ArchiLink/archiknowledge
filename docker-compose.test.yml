@@ -41,6 +41,7 @@ services:
       LIVE_MEDIA_ROOT: /app/live-media  # the media volume web and the proxies use
     volumes:
       - media:/app/live-media
+      - ./.github:/app/.github:ro  # excluded from images; tests check the issue template
     depends_on:
       proxy:
         condition: service_healthy

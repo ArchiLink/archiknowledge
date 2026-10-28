@@ -1,34 +1,57 @@
 {% load static %}<!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}{{ portal_name }}{% endblock %}</title>
+  <link rel="stylesheet" href="{% static 'vendor/pico/pico-2.1.1.min.css' %}">
+  <link rel="stylesheet" href="{% static 'css/portal.css' %}">
   {# CSP-friendly HTMX: no inline indicator styles, no eval, no script tags in responses. #}
   <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false, "allowScriptTags": false}'>
   <script src="{% static 'vendor/htmx/htmx-2.0.11.min.js' %}" defer></script>
+  {% block head %}{% endblock %}
 </head>
 {# HTMX sends the CSRF token on state-changing requests; only signed-in users make those. #}
 <body{% if user.is_authenticated %} hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'{% endif %}>
-  <header>
-    <a href="/">{{ portal_name }}</a>
-    <a href="{% url 'knowledge_base' %}">Knowledge base</a>
-    <a href="{% url 'gallery' %}">Redline Gallery</a>
-    {% if user.is_authenticated %}
-      <a href="{% url 'submit_lesson' %}">Submit a lesson</a>
-      <a href="{% url 'my_submissions' %}">My submissions</a>
-      {% if is_qa_reviewer %}<a href="{% url 'review_queue' %}">Review queue</a>{% endif %}
-      <span>Signed in as {{ user.get_username }}</span>
-      <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">Sign out</button>
-      </form>
-    {% else %}
-      <a href="{% url 'login' %}">Sign in</a>
-    {% endif %}
+  <header class="site-header">
+    <div class="container header-top">
+      <a href="/" class="brand">
+        <img src="{% static 'img/architecttura-logo.png' %}" alt="architecttura" width="727" height="95">
+        <span class="brand-name">{{ portal_name }}</span>
+      </a>
+      <div class="account">
+        {% if user.is_authenticated %}
+          <span>Signed in as <strong>{{ user.get_username }}</strong></span>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="secondary outline">Sign out</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" role="button" class="outline">Sign in</a>
+        {% endif %}
+      </div>
+    </div>
+    <nav class="site-nav">
+      <ul class="container">
+        <li><a href="/"{% if nav_section == "dashboard" %} aria-current="page"{% endif %}>Dashboard</a></li>
+        <li><a href="{% url 'knowledge_base' %}"{% if nav_section == "knowledge" %} aria-current="page"{% endif %}>Knowledge base</a></li>
+        <li><a href="{% url 'gallery' %}"{% if nav_section == "gallery" %} aria-current="page"{% endif %}>Redline Gallery</a></li>
+        {% if user.is_authenticated %}
+          <li><a href="{% url 'submit_lesson' %}"{% if nav_section == "submit" %} aria-current="page"{% endif %}>Submit a lesson</a></li>
+          <li><a href="{% url 'my_submissions' %}"{% if nav_section == "mine" %} aria-current="page"{% endif %}>My submissions</a></li>
+          {% if is_qa_reviewer %}<li><a href="{% url 'review_queue' %}"{% if nav_section == "review" %} aria-current="page"{% endif %}>Review queue</a></li>{% endif %}
+        {% endif %}
+      </ul>
+    </nav>
   </header>
-  <main>
+  <main class="container">
     {% block content %}{% endblock %}
   </main>
+  <footer class="site-footer">
+    <div class="container">
+      <span><strong>architecttura</strong> inc. · Architects &amp; Engineers · <span class="brand-red">Building Intelligence</span></span>
+      <span>Windsor · Toronto · Detroit · Internal use only</span>
+    </div>
+  </footer>
 </body>
 </html>

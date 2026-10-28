@@ -7,12 +7,6 @@ import pytest
 pytestmark = pytest.mark.django_db
 
 
-@pytest.fixture
-def error_urls(settings):
-    settings.ROOT_URLCONF = "tests.error_urls"
-    settings.DEBUG = False
-
-
 def test_500_is_generic_and_traceback_is_logged(client, error_urls, caplog):
     client.raise_request_exception = False
     with caplog.at_level(logging.ERROR):
