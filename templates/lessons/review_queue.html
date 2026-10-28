@@ -3,36 +3,43 @@
 {% block title %}Review queue · {{ portal_name }}{% endblock %}
 
 {% block content %}
-  <h1>Review queue</h1>
-  <form method="get" action="{% url 'export_lessons' %}">
-    <label>Export lessons with status
-      <select name="status">
+  <div class="page-head with-action">
+    <div>
+      <h1>Review queue</h1>
+      <p class="lede">Submitted lessons waiting for QA, oldest first.</p>
+    </div>
+    <form method="get" action="{% url 'export_lessons' %}" class="inline-form">
+      <label for="export-status">Export lessons with status</label>
+      <select name="status" id="export-status">
         <option value="">Any</option>
         <option value="submitted">Submitted</option>
         <option value="approved">Approved</option>
         <option value="rejected">Rejected</option>
       </select>
-    </label>
-    <button type="submit">Download CSV</button>
-  </form>
+      <button type="submit" class="secondary outline">Download CSV</button>
+    </form>
+  </div>
   {% if lessons %}
-    <table>
-      <thead>
-        <tr><th>Title</th><th>Project</th><th>Phase</th><th>Submitted by</th><th>Submitted</th></tr>
-      </thead>
-      <tbody>
-        {% for lesson in lessons %}
-          <tr>
-            <td><a href="{% url 'review_lesson' lesson.pk %}">{{ lesson.title }}</a></td>
-            <td>{{ lesson.project }}</td>
-            <td>{{ lesson.phase.code }}</td>
-            <td>{{ lesson.submitted_by.get_username }}</td>
-            <td>{{ lesson.submitted_at|date:"j M Y" }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr><th scope="col">Title</th><th scope="col">Project</th><th scope="col">Phase</th><th scope="col">Submitted by</th><th scope="col">Submitted</th><th scope="col"><span class="visually-hidden">Action</span></th></tr>
+        </thead>
+        <tbody>
+          {% for lesson in lessons %}
+            <tr>
+              <td><a href="{% url 'review_lesson' lesson.pk %}">{{ lesson.title }}</a></td>
+              <td>{{ lesson.project }}</td>
+              <td><abbr class="badge badge-phase" title="{{ lesson.phase.name }}">{{ lesson.phase.code }}</abbr></td>
+              <td>{{ lesson.submitted_by.get_username }}</td>
+              <td>{{ lesson.submitted_at|date:"j M Y" }}</td>
+              <td class="row-action"><a href="{% url 'review_lesson' lesson.pk %}" role="button" class="secondary outline">Review</a></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p>Nothing is waiting for review.</p>
+    <p class="empty-state">Nothing is waiting for review.</p>
   {% endif %}
 {% endblock %}

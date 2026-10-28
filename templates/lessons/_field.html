@@ -1,0 +1,10 @@
+{# One form field: label, widget, help text and errors beside it. Django adds aria-invalid and aria-describedby. #}
+{% if field.widget_type == "checkbox" %}
+  <label class="checkbox-field">{{ field }} {{ field.label }}</label>
+  {% if field.help_text %}<small id="{{ field.auto_id }}_helptext">{{ field.help_text }}</small>{% endif %}
+{% else %}
+  <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %} <span class="required" aria-hidden="true">*</span>{% endif %}</label>
+  {{ field }}
+  {% if field.help_text %}<small id="{{ field.auto_id }}_helptext">{{ field.help_text }}</small>{% endif %}
+{% endif %}
+{% for error in field.errors %}<small class="field-error">{{ error }}</small>{% endfor %}

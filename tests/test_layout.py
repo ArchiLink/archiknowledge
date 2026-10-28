@@ -117,3 +117,18 @@ def test_issue_template_has_ui_module():
     template = (ROOT / ".github" / "ISSUE_TEMPLATE" / "requirement.yml").read_text("utf-8")
     assert "`UI` (site-wide layout and styling)" in template
     assert "- Site-wide layout & styling" in template
+
+
+# REQ-UI-001 AC-02: every full page uses the theme (partials and emails excluded).
+
+
+def test_every_page_template_uses_the_theme():
+    pages = [
+        path
+        for path in (ROOT / "templates").rglob("*.html")
+        if not path.name.startswith("_") and "emails" not in path.parts
+    ]
+    assert len(pages) >= 15
+    for path in pages:
+        text = path.read_text(encoding="utf-8")
+        assert '{% extends "base.html" %}' in text or "css/portal.css" in text, path

@@ -3,27 +3,34 @@
 {% block title %}My submissions · {{ portal_name }}{% endblock %}
 
 {% block content %}
-  <h1>My submissions</h1>
+  <div class="page-head with-action">
+    <div>
+      <h1>My submissions</h1>
+      <p class="lede">Everything you have submitted, and where it is in review.</p>
+    </div>
+    <a href="{% url 'submit_lesson' %}" role="button">Submit a lesson</a>
+  </div>
   {% if lessons %}
-    <table>
-      <thead>
-        <tr><th>Title</th><th>Project</th><th>Phase</th><th>Status</th><th>Submitted</th><th>Reviewed</th></tr>
-      </thead>
-      <tbody>
-        {% for lesson in lessons %}
-          <tr>
-            <td><a href="{% url 'my_submission_detail' lesson.pk %}">{{ lesson.title }}</a></td>
-            <td>{{ lesson.project }}</td>
-            <td>{{ lesson.phase.code }}</td>
-            <td>{{ lesson.get_status_display }}</td>
-            <td>{{ lesson.submitted_at|date:"j M Y" }}</td>
-            <td>{{ lesson.reviewed_at|date:"j M Y"|default:"–" }}</td>
-          </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-card">
+      <table>
+        <thead>
+          <tr><th scope="col">Title</th><th scope="col">Project</th><th scope="col">Phase</th><th scope="col">Status</th><th scope="col">Submitted</th><th scope="col">Reviewed</th></tr>
+        </thead>
+        <tbody>
+          {% for lesson in lessons %}
+            <tr>
+              <td><a href="{% url 'my_submission_detail' lesson.pk %}">{{ lesson.title }}</a></td>
+              <td>{{ lesson.project }}</td>
+              <td><abbr class="badge badge-phase" title="{{ lesson.phase.name }}">{{ lesson.phase.code }}</abbr></td>
+              <td>{% include "lessons/_status_badge.html" %}</td>
+              <td>{{ lesson.submitted_at|date:"j M Y" }}</td>
+              <td>{{ lesson.reviewed_at|date:"j M Y"|default:"–" }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   {% else %}
-    <p>You haven't submitted any lessons yet.</p>
+    <p class="empty-state">You haven't submitted any lessons yet.</p>
   {% endif %}
-  <p><a href="{% url 'submit_lesson' %}">Submit a lesson</a></p>
 {% endblock %}
