@@ -1,19 +1,7 @@
-<p>{{ page.paginator.count }} lesson{{ page.paginator.count|pluralize }}</p>
+<p class="result-count"><strong>{{ page.paginator.count }}</strong> lesson{{ page.paginator.count|pluralize }}</p>
 {% for lesson in page %}
-  <article>
-    <h2><a href="{% url 'lesson_detail' lesson.pk %}">{{ lesson.title }}</a></h2>
-    <p>{{ lesson.phase.code }} · {{ lesson.discipline }} · {{ lesson.issue_type }}
-      · {{ lesson.get_impact_display }} impact · {{ lesson.public_project }}
-      · {{ lesson.approved_at|date:"j M Y" }}</p>
-    <p>{{ lesson.lesson|truncatewords:30 }}</p>
-  </article>
+  {% include "lessons/_lesson_card.html" %}
 {% empty %}
-  <p>No lessons match these filters.</p>
+  <p class="empty-state">No lessons match these filters.</p>
 {% endfor %}
-{% if page.has_other_pages %}
-  <nav aria-label="Pages">
-    {% if page.has_previous %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.previous_page_number }}">Previous</a>{% endif %}
-    Page {{ page.number }} of {{ page.paginator.num_pages }}
-    {% if page.has_next %}<a href="?{% if querystring %}{{ querystring }}&amp;{% endif %}page={{ page.next_page_number }}">Next</a>{% endif %}
-  </nav>
-{% endif %}
+{% include "lessons/_pager.html" %}

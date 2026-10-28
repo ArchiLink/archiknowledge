@@ -3,42 +3,72 @@
 {% block title %}{{ lesson.title }} · {{ portal_name }}{% endblock %}
 
 {% block content %}
-  <article>
+  <nav aria-label="Breadcrumb" class="breadcrumb">
+    <a href="{% url 'knowledge_base' %}">Knowledge base</a> <span aria-hidden="true">/</span> <span>{{ lesson.phase.code }}</span>
+  </nav>
+  <div class="page-head">
+    <div class="lesson-tags">
+      <abbr class="badge badge-phase" title="{{ lesson.phase.name }}">{{ lesson.phase.code }}</abbr>
+      <span class="badge impact-{{ lesson.impact }}">{{ lesson.get_impact_display }} impact</span>
+      <span class="lede">published {{ lesson.approved_at|date:"j M Y" }}</span>
+    </div>
     <h1>{{ lesson.title }}</h1>
-    <p>{{ lesson.phase }} · {{ lesson.discipline }} · {{ lesson.get_impact_display }} impact
-      · published {{ lesson.approved_at|date:"j M Y" }}</p>
-    <dl>
-      <dt>Project</dt><dd>{{ lesson.public_project }}</dd>
-      <dt>Issue type</dt><dd>{{ lesson.issue_type }}</dd>
-      <dt>Building component</dt><dd>{{ lesson.building_component }}</dd>
-      {% if lesson.cost_impact is not None %}<dt>Cost impact</dt><dd>{{ lesson.cost_impact }}</dd>{% endif %}
-      {% if lesson.time_impact_days is not None %}<dt>Time impact</dt><dd>{{ lesson.time_impact_days }} day{{ lesson.time_impact_days|pluralize }}</dd>{% endif %}
-    </dl>
+  </div>
 
-    <h2>What happened</h2>
-    <p>{{ lesson.description|linebreaksbr }}</p>
-    <h2>Lesson</h2>
-    <p>{{ lesson.lesson|linebreaksbr }}</p>
+  <div class="detail-grid">
+    <div>
+      <article class="panel prose">
+        <h2>What happened</h2>
+        <p>{{ lesson.description|linebreaksbr }}</p>
+        <h2>Lesson</h2>
+        <p class="lesson-callout">{{ lesson.lesson|linebreaksbr }}</p>
+      </article>
 
-    <h2>Incorporated into</h2>
-    <ul>
-      <li>Specifications: {{ lesson.in_specs|yesno:"Yes,Not yet" }}</li>
-      <li>Standard details: {{ lesson.in_standard_details|yesno:"Yes,Not yet" }}</li>
-      <li>Onboarding: {{ lesson.in_onboarding|yesno:"Yes,Not yet" }}</li>
-    </ul>
-    {% if incorporation_form %}
-      <form method="post" action="{% url 'update_incorporation' lesson.pk %}">
-        {% csrf_token %}
-        {{ incorporation_form.as_div }}
-        <button type="submit">Update incorporation</button>
-      </form>
-    {% endif %}
+      {% regroup lesson.images.all by get_kind_display as image_groups %}
+      {% if image_groups %}
+        <section class="image-pair" aria-label="Images">
+          {% for group in image_groups %}
+            <div class="image-column kind-{{ group.list.0.kind }}">
+              <h2 class="kind-label">{{ group.grouper }}</h2>
+              {% for image in group.list %}
+                <figure>
+                  <a href="{{ image.file.url }}" target="_blank" rel="noopener"><img src="{{ image.file.url }}" alt="{{ image.get_kind_display }} image" loading="lazy"></a>
+                </figure>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </section>
+      {% endif %}
+    </div>
 
-    {% for image in lesson.images.all %}
-      <figure>
-        <img src="{{ image.file.url }}" alt="{{ image.get_kind_display }} image" loading="lazy">
-        <figcaption>{{ image.get_kind_display }}</figcaption>
-      </figure>
-    {% endfor %}
-  </article>
+    <aside>
+      <article class="panel">
+        <h2>Details</h2>
+        <dl class="facts">
+          <dt>Phase</dt><dd>{{ lesson.phase }}</dd>
+          <dt>Discipline</dt><dd>{{ lesson.discipline }}</dd>
+          <dt>Project</dt><dd>{{ lesson.public_project }}</dd>
+          <dt>Issue type</dt><dd>{{ lesson.issue_type }}</dd>
+          <dt>Building component</dt><dd>{{ lesson.building_component }}</dd>
+          {% if lesson.cost_impact is not None %}<dt>Cost impact</dt><dd>{{ lesson.cost_impact }}</dd>{% endif %}
+          {% if lesson.time_impact_days is not None %}<dt>Time impact</dt><dd>{{ lesson.time_impact_days }} day{{ lesson.time_impact_days|pluralize }}</dd>{% endif %}
+        </dl>
+      </article>
+      <article class="panel">
+        <h2>Incorporated into</h2>
+        <ul class="checklist">
+          <li class="{{ lesson.in_specs|yesno:'done,todo' }}">Specifications: {{ lesson.in_specs|yesno:"Yes,Not yet" }}</li>
+          <li class="{{ lesson.in_standard_details|yesno:'done,todo' }}">Standard details: {{ lesson.in_standard_details|yesno:"Yes,Not yet" }}</li>
+          <li class="{{ lesson.in_onboarding|yesno:'done,todo' }}">Onboarding: {{ lesson.in_onboarding|yesno:"Yes,Not yet" }}</li>
+        </ul>
+        {% if incorporation_form %}
+          <form method="post" action="{% url 'update_incorporation' lesson.pk %}" class="incorporation-form">
+            {% csrf_token %}
+            {% for field in incorporation_form %}<label>{{ field }} {{ field.label }}</label>{% endfor %}
+            <button type="submit" class="secondary">Update incorporation</button>
+          </form>
+        {% endif %}
+      </article>
+    </aside>
+  </div>
 {% endblock %}

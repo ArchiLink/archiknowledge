@@ -530,3 +530,231 @@ body.ticker {
   font-size: 0.8125rem;
   white-space: nowrap;
 }
+
+/* --- Knowledge base: search, filters, results, pager (REQ-UI-004) --- */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.filter-panel {
+  display: block;
+  margin-bottom: 1.5rem;
+  padding: 1.1rem 1.25rem 0.4rem;
+  border-radius: var(--pico-border-radius);
+  background: #fff;
+  box-shadow: var(--pico-card-box-shadow);
+}
+
+.filter-search {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.filter-panel form {
+  margin-bottom: 0;
+}
+
+.filter-search input {
+  flex: 1;
+}
+
+.filter-search button {
+  width: auto;
+  padding-inline: 1.5rem;
+}
+
+.filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0 0.75rem;
+}
+
+.filter-grid label {
+  color: var(--brand-grey);
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+
+.filter-grid select {
+  margin-top: 0.25rem;
+  padding-block: 0.4rem;
+  font-size: 0.875rem;
+}
+
+.result-count {
+  color: var(--brand-grey);
+}
+
+.result-count strong {
+  color: var(--brand-ink);
+}
+
+.pager {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  color: var(--brand-grey);
+  font-size: 0.875rem;
+}
+
+.pager [role="button"] {
+  padding: 0.35rem 1rem;
+  font-size: 0.875rem;
+}
+
+/* --- Lesson detail (REQ-UI-004) --- */
+.breadcrumb {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  color: var(--brand-grey);
+  font-size: 0.875rem;
+}
+
+.breadcrumb a {
+  color: var(--brand-grey);
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .detail-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.prose h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+}
+
+.lesson-callout {
+  margin-bottom: 0;
+  padding: 0.85rem 1rem;
+  border-left: 4px solid var(--brand-red);
+  border-radius: 0 var(--pico-border-radius) var(--pico-border-radius) 0;
+  background: #fdf3f3;
+  font-weight: 500;
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.45rem 1rem;
+  margin-bottom: 0;
+  font-size: 0.9rem;
+}
+
+.facts dt {
+  color: var(--brand-grey);
+  font-weight: 400;
+}
+
+.facts dd {
+  margin: 0;
+  font-weight: 600;
+}
+
+.checklist {
+  padding: 0;
+  font-size: 0.9rem;
+}
+
+.checklist li {
+  margin-bottom: 0.35rem;
+  list-style: none;
+  padding-left: 1.6rem;
+  position: relative;
+}
+
+.checklist li::before {
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+}
+
+.checklist li.done::before {
+  content: "\2713";
+  color: #1e7d45;
+}
+
+.checklist li.todo::before {
+  content: "\2013";
+  color: var(--brand-grey);
+}
+
+.incorporation-form {
+  margin: 1rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--brand-line);
+  font-size: 0.9rem;
+}
+
+/* --- Failed vs Fixed images, side by side (detail page and gallery) --- */
+.image-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 1rem;
+}
+
+.image-column {
+  padding: 0.9rem;
+  border-top: 4px solid var(--brand-grey);
+  border-radius: var(--pico-border-radius);
+  background: #fff;
+  box-shadow: var(--pico-card-box-shadow);
+}
+
+.kind-label {
+  margin-bottom: 0.6rem;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.kind-failed {
+  border-top-color: var(--brand-red);
+}
+
+.kind-failed .kind-label {
+  color: var(--brand-red);
+}
+
+.kind-fixed {
+  border-top-color: #1e7d45;
+}
+
+.kind-fixed .kind-label {
+  color: #1e7d45;
+}
+
+.image-column figure {
+  margin: 0 0 0.75rem;
+}
+
+.image-column figure:last-child {
+  margin-bottom: 0;
+}
+
+.image-column img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  object-fit: contain;
+  border: 1px solid var(--brand-line);
+  border-radius: calc(var(--pico-border-radius) - 2px);
+  background: var(--brand-surface);
+}
