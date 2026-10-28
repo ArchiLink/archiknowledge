@@ -6,11 +6,11 @@ Security controls and accepted risks for the portal. Actors, components and depl
 - Exposure: intranet only, HTTP on `PORTAL_ADDRESS:PORTAL_PORT`. Anyone on the intranet can view Approved lessons; adding or changing anything requires login.
 - Roles: the actors in ARCHITECTURE.md, enforced through the Django groups `Staff` and `QA Reviewers`; admins are named accounts.
 - Sensitive data: Internal (staff only, never shared outside the firm): cost/time impact, staff names, site photos, redlined drawings. Project names of lessons flagged `anonymise` are Confidential.
-- Secrets: Django `SECRET_KEY`, Postgres password, SMTP credentials, backup passphrase.
+- Secrets: Django `SECRET_KEY`, Postgres password, SMTP credentials.
 - Trust boundaries: browser ↔ Caddy (HTTP); Caddy ↔ gunicorn; Django ↔ Postgres; outbound SMTP; WordPress iframe of `/embed/*`.
 - CI/CD: none; checks run locally before merging (see Deployment).
 - Log retention: container stdout via Docker logging, kept 90 days.
-- Backups: nightly encrypted Postgres dump + media archive in `BACKUP_DIR`, kept as 14 daily + 12 monthly; an off-machine share is recommended.
+- Backups: the server team snapshots the whole VM nightly and weekly, with the VM shut down so Postgres is consistent; the portal runs no backup service of its own.
 
 ## Provisional Security Rules
 
@@ -62,8 +62,8 @@ Security controls and accepted risks for the portal. Actors, components and depl
 - Run `manage.py check --deploy` before each release. HTTPS, HSTS and secure-cookie warnings are expected; fix anything else.
 - Pin Python dependencies in a lockfile; pin base images to a specific tag; rebuild monthly and when security updates are released.
 - Run containers as a non-root user. Store uploads without an execute bit (`0640`), only as re-encoded images, and serve them read-only through Caddy; Docker named volumes can't be mounted `noexec`.
-- Take a backup before applying migrations in production; test a restore quarterly.
-- Encrypt backups with `BACKUP_PASSPHRASE` and keep the passphrase somewhere other than the server.
+- Before applying migrations in production, confirm the last VM snapshot succeeded (or ask the server team for one); ask them to test a restore quarterly.
+- Containers use `restart: unless-stopped` and Docker starts at boot, so the portal comes back after each nightly snapshot shutdown.
 
 ### Accepted risks
 - Without TLS, passwords and session cookies cross the office network unencrypted. The login page tells users not to reuse their Windows/M365 password.
@@ -71,4 +71,4 @@ Security controls and accepted risks for the portal. Actors, components and depl
 - Reconsider both risks if guests or contractors share the network.
 
 ## Prompt Placeholders To Resolve
-None for security. Deployment values (IP, port, framing, mail server, backup location) are set in `.env` by the deployer; product questions are listed in ARCHITECTURE.md.
+None for security. Deployment values (IP, port, framing, mail server) are set in `.env` by the deployer; product questions are listed in ARCHITECTURE.md.

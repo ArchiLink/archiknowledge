@@ -5,7 +5,6 @@
 .ruff_cache
 .pytest_cache
 .coverage
-backups
 staticfiles
 **/__pycache__
 media

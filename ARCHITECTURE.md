@@ -15,7 +15,7 @@ What the portal is and how it is built. Security controls are in SECURITY.md; ru
 - API and integrations: no public API. Outbound email via SMTP (set up later); linked from the WordPress intranet, which may iframe the ticker.
 - Authentication: local Django accounts created by an admin; server-side sessions; Entra ID SSO is a possible later addition.
 - Data model: lookup tables Phase, Discipline, IssueType, BuildingComponent are rows managed in Django admin, not hard-coded choices. Project 1→N Lesson; Lesson 1→N LessonImage (kind FAILED/FIXED). Lesson status Submitted → Approved/Rejected. Postgres full-text search over the lesson text fields. Images stored on a Docker volume.
-- Deployment: Docker Compose on one intranet VM, plain HTTP on an IP address (no domain, no TLS, no CI), configured via `.env` (keys in `.env.example`). Services: `web` (gunicorn), `db` (postgres), `proxy` (Caddy), `scheduler` (digest job), `backup` (nightly DB dump + media archive).
+- Deployment: Docker Compose on one intranet VM, plain HTTP on an IP address (no domain, no TLS, no CI), configured via `.env` (keys in `.env.example`). Services: `web` (gunicorn), `db` (postgres), `proxy` (Caddy), `scheduler` (digest job). Backups are nightly whole-VM snapshots taken by the server team with the VM shut down; the portal has no backup service.
 - Scale: about 30 staff; low volume; single instance; available during business hours.
 
 ## Initial Architecture (Provisional)
