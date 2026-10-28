@@ -3,11 +3,15 @@
 {% block title %}Submit a lesson · {{ portal_name }}{% endblock %}
 
 {% block content %}
-  <h1>Submit a lesson</h1>
-  <p>Describe the omission, error or site lesson. QA reviews every submission before it is published.</p>
-  <form method="post" enctype="multipart/form-data">
+  <div class="page-head">
+    <h1>Submit a lesson</h1>
+    <p class="lede">Describe the omission, error or site lesson. QA reviews every submission before it is published.</p>
+  </div>
+  <form method="post" enctype="multipart/form-data" class="form-card">
     {% csrf_token %}
-    {{ form.as_div }}
-    <button type="submit">Submit for review</button>
+    {% include "lessons/_lesson_fields.html" %}
+    <div class="form-actions">
+      <button type="submit">Submit for review</button>
+    </div>
   </form>
 {% endblock %}

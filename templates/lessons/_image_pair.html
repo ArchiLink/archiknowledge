@@ -1,0 +1,16 @@
+{# A lesson's images in Failed and Fixed columns; images are ordered by kind. #}
+{% regroup lesson.images.all by get_kind_display as image_groups %}
+{% if image_groups %}
+  <section class="image-pair" aria-label="Images">
+    {% for group in image_groups %}
+      <div class="image-column kind-{{ group.list.0.kind }}">
+        <h2 class="kind-label">{{ group.grouper }}</h2>
+        {% for image in group.list %}
+          <figure>
+            <a href="{{ image.file.url }}" target="_blank" rel="noopener"><img src="{{ image.file.url }}" alt="{{ image.get_kind_display }} image" loading="lazy"></a>
+          </figure>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </section>
+{% endif %}

@@ -1,0 +1,43 @@
+{# Lesson fields grouped into sections; shared by the submission form and the QA review form. #}
+{% if form.non_field_errors %}
+  <div role="alert">{% for error in form.non_field_errors %}<p>{{ error }}</p>{% endfor %}</div>
+{% endif %}
+{% for field in form.hidden_fields %}{{ field }}{% endfor %}
+
+<fieldset class="form-section">
+  <legend>The lesson</legend>
+  <div class="field">{% include "lessons/_field.html" with field=form.title %}</div>
+  <div class="field">{% include "lessons/_field.html" with field=form.description %}</div>
+  <div class="field">{% include "lessons/_field.html" with field=form.lesson %}</div>
+</fieldset>
+
+<fieldset class="form-section">
+  <legend>Classification</legend>
+  <div class="field-grid">
+    <div class="field">{% include "lessons/_field.html" with field=form.project %}</div>
+    <div class="field">{% include "lessons/_field.html" with field=form.phase %}</div>
+    <div class="field">{% include "lessons/_field.html" with field=form.discipline %}</div>
+    <div class="field">{% include "lessons/_field.html" with field=form.issue_type %}</div>
+    <div class="field">{% include "lessons/_field.html" with field=form.building_component %}</div>
+  </div>
+  {% if form.anonymise %}<div class="field">{% include "lessons/_field.html" with field=form.anonymise %}</div>{% endif %}
+</fieldset>
+
+<fieldset class="form-section">
+  <legend>Impact</legend>
+  <div class="field-grid">
+    <div class="field">{% include "lessons/_field.html" with field=form.impact %}</div>
+    <div class="field">{% include "lessons/_field.html" with field=form.cost_impact %}</div>
+    <div class="field">{% include "lessons/_field.html" with field=form.time_impact_days %}</div>
+  </div>
+</fieldset>
+
+{% if form.failed_images %}
+  <fieldset class="form-section">
+    <legend>Images</legend>
+    <div class="field-grid two">
+      <div class="field upload kind-failed">{% include "lessons/_field.html" with field=form.failed_images %}</div>
+      <div class="field upload kind-fixed">{% include "lessons/_field.html" with field=form.fixed_images %}</div>
+    </div>
+  </fieldset>
+{% endif %}

@@ -3,7 +3,13 @@
 {% block title %}Lesson submitted · {{ portal_name }}{% endblock %}
 
 {% block content %}
-  <h1>Thank you</h1>
-  <p>“{{ lesson.title }}” has been submitted and is waiting for QA review.</p>
-  <p><a href="{% url 'my_submissions' %}">See my submissions</a> · <a href="{% url 'submit_lesson' %}">Submit another lesson</a></p>
+  <article class="narrow-card success-card">
+    <p class="success-mark" aria-hidden="true">&#10003;</p>
+    <h1>Thank you</h1>
+    <p>“{{ lesson.title }}” has been submitted and is waiting for QA review.</p>
+    <div class="form-actions centered">
+      <a href="{% url 'my_submissions' %}" role="button" class="secondary outline">See my submissions</a>
+      <a href="{% url 'submit_lesson' %}" role="button">Submit another lesson</a>
+    </div>
+  </article>
 {% endblock %}
