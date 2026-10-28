@@ -1,9 +1,12 @@
-<!doctype html>
-<html lang="en">
-<head><meta charset="utf-8"><title>Bad request</title></head>
-<body>
-  <h1>Bad request</h1>
-  <p>Some of the search or filter values weren't valid. Please change them and try again.</p>
-  <p><a href="/">Back to the portal</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Bad request · {{ portal_name }}{% endblock %}
+
+{% block content %}
+  <section class="error-page">
+    <p class="error-code">400</p>
+    <h1>Bad request</h1>
+    <p>Some of the search or filter values weren't valid. Please change them and try again.</p>
+    <p><a href="/" role="button">Back to the portal</a></p>
+  </section>
+{% endblock %}

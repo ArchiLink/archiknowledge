@@ -20,6 +20,12 @@ def media_root(settings, tmp_path):
 
 
 @pytest.fixture
+def error_urls(settings):
+    settings.ROOT_URLCONF = "tests.error_urls"
+    settings.DEBUG = False
+
+
+@pytest.fixture
 def staff_member(django_user_model):
     return django_user_model.objects.create_user(username="staffer", password="x" * 12)
 
