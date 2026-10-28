@@ -76,3 +76,15 @@ def test_dependencies_are_locked():
 def test_compose_parser_detects_published_port():
     text = "services:\n  web:\n    ports:\n      - '80:80'\nvolumes:\n  x:\n"
     assert compose_services(text) == {"web": ["    ports:", "      - '80:80'"]}
+
+
+def compose_project_name(path):
+    match = re.search(r"^name:\s*(\S+)\s*$", path.read_text(), re.MULTILINE)
+    return match.group(1) if match else None
+
+
+def test_test_stack_has_its_own_project_name():
+    # REQ-OPS-008 AC-01: the default project name comes from the folder, so set one for tests.
+    test_name = compose_project_name(ROOT / "docker-compose.test.yml")
+    assert test_name
+    assert test_name != compose_project_name(ROOT / "docker-compose.yml")
