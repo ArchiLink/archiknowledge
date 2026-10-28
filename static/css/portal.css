@@ -234,3 +234,299 @@ h1 {
   line-height: 1;
   margin-bottom: 0.5rem;
 }
+
+/* --- Page heads, badges and lesson cards (REQ-UI-003) --- */
+.page-head {
+  margin-bottom: 1.25rem;
+}
+
+.page-head h1 {
+  margin-bottom: 0.25rem;
+}
+
+.lede {
+  color: var(--brand-grey);
+  margin-bottom: 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  white-space: nowrap;
+  background: var(--brand-line);
+  color: var(--brand-ink);
+}
+
+abbr.badge {
+  border-bottom: 0;
+  cursor: help;
+}
+
+.badge-phase {
+  background: var(--brand-ink);
+  color: #fff;
+}
+
+/* Impact: High uses the brand red; it always carries the word, never colour alone. */
+.impact-high {
+  background: #fdecec;
+  color: #a91f25;
+  box-shadow: inset 0 0 0 1px #f3b8ba;
+}
+
+.impact-medium {
+  background: #fff4dc;
+  color: #7a5200;
+  box-shadow: inset 0 0 0 1px #f0d595;
+}
+
+.impact-low {
+  background: #eef0f2;
+  color: #4a4e55;
+  box-shadow: inset 0 0 0 1px #d8dbdf;
+}
+
+.lesson-card {
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.25rem;
+  border-left: 4px solid transparent;
+  transition: border-color 0.15s;
+}
+
+.lesson-card:hover {
+  border-left-color: var(--brand-red);
+}
+
+.lesson-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.lesson-tags time {
+  margin-left: auto;
+  color: var(--brand-grey);
+  font-size: 0.8125rem;
+}
+
+.lesson-card h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.25rem;
+}
+
+.lesson-card h2 a {
+  color: var(--brand-ink);
+  text-decoration: none;
+}
+
+.lesson-card h2 a:hover {
+  color: var(--brand-red);
+  text-decoration: underline;
+}
+
+.lesson-context {
+  color: var(--brand-grey);
+  font-size: 0.875rem;
+  margin-bottom: 0.5rem;
+}
+
+.lesson-card > p:last-child {
+  margin-bottom: 0;
+}
+
+.empty-state {
+  padding: 2rem;
+  border: 1px dashed var(--brand-line);
+  border-radius: var(--pico-border-radius);
+  background: #fff;
+  color: var(--brand-grey);
+  text-align: center;
+}
+
+/* --- Phase filter tabs --- */
+.phase-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start; /* Pico spreads nav items apart */
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
+}
+
+.phase-tabs a {
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--brand-line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--brand-ink);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.phase-tabs a:hover {
+  border-color: var(--brand-red);
+  color: var(--brand-red);
+}
+
+.phase-tabs a[aria-current="page"] {
+  border-color: var(--brand-ink);
+  background: var(--brand-ink);
+  color: #fff;
+}
+
+/* --- Dashboard: feed beside the charts --- */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 1.5rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .dashboard-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.panel {
+  margin-bottom: 1rem;
+  padding: 1.1rem 1.25rem;
+}
+
+.panel h2 {
+  font-size: 1.05rem;
+  margin-bottom: 0.35rem;
+}
+
+.panel h3 {
+  font-size: 0.95rem;
+  color: var(--brand-grey);
+  margin-bottom: 0.75rem;
+}
+
+.panel-total {
+  color: var(--brand-grey);
+  font-size: 0.875rem;
+}
+
+.panel-total strong {
+  color: var(--brand-ink);
+  font-size: 1.25rem;
+}
+
+.period-form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); /* let month inputs shrink */
+  gap: 0 0.75rem;
+  margin-bottom: 0;
+}
+
+.period-form .span-2 {
+  grid-column: span 2;
+}
+
+.period-form label,
+.period-form select,
+.period-form input,
+.period-form button {
+  font-size: 0.875rem;
+}
+
+.period-form select,
+.period-form input,
+.period-form button {
+  margin-bottom: 0.6rem;
+  padding-block: 0.45rem;
+}
+
+table.compact {
+  margin: 1rem 0 0;
+  font-size: 0.875rem;
+}
+
+table.compact caption {
+  caption-side: top;
+  text-align: left;
+  color: var(--brand-grey);
+  font-size: 0.8125rem;
+  padding-bottom: 0.35rem;
+}
+
+table.compact th,
+table.compact td {
+  padding: 0.35rem 0.5rem;
+}
+
+table.compact td:last-child,
+table.compact th:last-child {
+  text-align: right;
+}
+
+/* --- Embed ticker: a compact strip inside the WordPress iframe --- */
+body.ticker {
+  display: block;
+  min-height: 0;
+  background: #fff;
+  font-size: 0.875rem;
+}
+
+.ticker-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 2px solid var(--brand-red);
+}
+
+.ticker-head img {
+  height: 16px;
+  width: auto;
+}
+
+.ticker-head a {
+  margin-left: auto;
+  font-size: 0.8125rem;
+}
+
+#ticker {
+  margin: 0;
+  padding: 0;
+}
+
+#ticker li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--brand-line);
+  list-style: none;
+}
+
+#ticker li a {
+  overflow: hidden;
+  color: var(--brand-ink);
+  font-weight: 600;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#ticker li a:hover {
+  color: var(--brand-red);
+}
+
+#ticker li span {
+  margin-left: auto;
+  color: var(--brand-grey);
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
