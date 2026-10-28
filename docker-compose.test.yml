@@ -2,6 +2,9 @@
 #   docker compose -f docker-compose.test.yml run --rm --build test
 # The credentials below are test-only and never used in production.
 
+# Own project name, so tests never replace or share volumes with the running portal (REQ-OPS-008).
+name: knowlegeportal-test
+
 x-django-env: &django-env
   DJANGO_SECRET_KEY: test-only-secret-key-not-for-production
   PORTAL_ADDRESS: 192.0.2.10
